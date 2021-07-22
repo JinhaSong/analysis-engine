@@ -1,122 +1,104 @@
 import os
+import time
+
 import cv2
 import torch
 # import torchvision.models as models
+import torchvision
 from torch import nn
 
 import torch
-from torch.autograd import Variable as V
-import torchvision.models as models
-from torchvision import transforms as trn
-from torch.nn import functional as F
 import os
 import numpy as np
 import cv2
 from PIL import Image
+from torch.autograd import Variable
+from torchvision.datasets import ImageFolder
+from torch.utils.data import DataLoader
+import torch.nn.functional as F
+
+from AnalysisEngine import settings
 from Modules.places import wideresnet
 from Modules.dummy.main import Dummy
+from WebAnalyzer.utils.media import frames_to_timecode
+from utils import Logging
+from Modules.places.metrictracker import label_map
 
-
-class Places365(Dummy):
+class Places17(Dummy):
     path = os.path.dirname(os.path.abspath(__file__))
 
     def __init__(self):
         super().__init__()
-        model_name = 'wideresnet18_places365.pth.tar'
+        model_name = 'resnet101-0722.pth.tar'
+        classes_name = "classes.txt"
         model_path = os.path.join(self.path, model_name)
-        self.classes, self.labels_IO = self.load_labels()
-        self.model = self.load_model(model_path)
+        classes_path = os.path.join(self.path, classes_name)
+
         self.topk = 5
         self.result = None
+        print(Logging.i("Start loading model({})".format(model_name)))
+        start_time = time.time()
+        self.device = torch.device("cuda:0")
+        self.classes = label_map(classes_path)
+        state = torch.load(model_path, map_location='cuda:0')
+        self.model = wideresnet.resnet101()
+        self.model.load_state_dict(state['state_dict'], strict=False)
+        self.model.to(self.device)
 
-    def recursion_change_bn(self, module):
-        if isinstance(module, torch.nn.BatchNorm2d):
-            module.track_running_stats = 1
-        else:
-            for i, (name, module1) in enumerate(module._modules.items()):
-                module1 = self.recursion_change_bn(module1)
-        return module
-
-
-    def load_labels(self):
-        file_name_category = os.path.join(self.path, 'categories_places365.txt')
-        classes = list()
-        with open(file_name_category) as class_file:
-            for line in class_file:
-                classes.append(line.strip().split(' ')[0][3:])
-        classes = tuple(classes)
-
-        # indoor and outdoor relevant
-        file_name_IO = os.path.join(self.path, 'IO_places365.txt')
-        with open(file_name_IO) as f:
-            lines = f.readlines()
-            labels_IO = []
-            for line in lines:
-                items = line.rstrip().split()
-                labels_IO.append(int(items[-1]) - 1)  # 0 is indoor, 1 is outdoor
-        labels_IO = np.array(labels_IO)
-
-        return classes, labels_IO
-
-
-    def hook_feature(self, module, input, output):
-        self.features_blobs.append(np.squeeze(output.data.cpu().numpy()))
-
-    def returnTF(self):
-        tf = trn.Compose([
-            trn.Resize((224, 224)),
-            trn.ToTensor(),
-            trn.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        self.mean = np.array([0.4914, 0.4822, 0.4465])
+        self.std = np.array([0.2023, 0.1994, 0.2010])
+        self.transforms = torchvision.transforms.Compose([
+            torchvision.transforms.RandomResizedCrop((224, 224)),
+            torchvision.transforms.ToTensor(),
         ])
-        return tf
+        end_time = time.time()
+        print(Logging.i("Model is successfully loaded - {} sec".format(end_time - start_time)))
 
-    def load_model(self, model_path):
-        self.features_blobs = []
+    def inference_by_video(self, frame_path_list, infos):
+        results = []
+        video_info = infos['video_info']
+        frame_urls = infos['frame_urls']
+        frame_dir_path = infos['frame_dir_path']
+        fps = video_info['extract_fps']
+        print(Logging.i("Start inference by video"))
 
-        model = wideresnet.resnet18(num_classes=365)
-        checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
-        state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint['state_dict'].items()}
-        model.load_state_dict(state_dict)
+        datasets = ImageFolder(frame_dir_path, transform=self.transforms, target_transform=None)
+        data_loader = DataLoader(datasets, batch_size=1, shuffle=False, num_workers=1)
 
-        # hacky way to deal with the upgraded batchnorm2D and avgpool layers...
-        for i, (name, module) in enumerate(model._modules.items()):
-            module = self.recursion_change_bn(model)
-        model.avgpool = torch.nn.AvgPool2d(kernel_size=14, stride=1, padding=0)
+        allFiles, _ = map(list, zip(*data_loader.dataset.samples))
 
-        model.eval()
-        # hook the feature extractor
-        features_names = ['layer4', 'avgpool']  # this is the last conv layer of the resnet
-        for name in features_names:
-            model._modules.get(name).register_forward_hook(self.hook_feature)
-        return model
+        for i, (input, label) in enumerate(data_loader):
+            self.model.eval()
+            input = input.to(self.device)
 
-    def load_image(self, image_path, tf):
-        img = Image.open(image_path)
-        input_img = V(tf(img).unsqueeze(0))
-        return input_img
+            output = self.model(input)
+            loss = F.softmax(output, dim=1).data.squeeze()
+            probs, idx = loss.sort(0, True)
+            probs = probs.cpu().numpy()
+            idx = idx.cpu().numpy()
+            file_path = str(allFiles[i]).replace("/workspace", "")
+            result = {
+                "frame_number": int((i + 1) * fps),
+                "frame_url": file_path,
+                "frame_result": []
+            }
+            for j in range(0, self.topk):
+                label = {'label': {
+                    'description': self.classes[idx[j]],
+                    'score': float(probs[j]) * 100,
+                }}
+                result['frame_result'].append(label)
+            results.append(result)
 
-    def inference_by_image(self, image_path):
-        tf = self.returnTF()
+        # for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
+        #     if idx % 10 == 0:
+        #         print(Logging.i("inference frame - frame number: {} / path: {}".format(int((idx + 1) * fps), frame_path)))
+        #     result = self.inference_by_image(frame_path)
+        #     result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
+        #     result["frame_number"] = int((idx + 1) * fps)
+        #     result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
+        #     results.append(result)
 
-        params = list(self.model.parameters())
-        weight_softmax = params[-2].data.numpy()
-        weight_softmax[weight_softmax < 0] = 0
+        self.result = results
 
-        input_img = self.load_image(image_path, tf)
-
-        # forward pass
-        logit = self.model.forward(input_img)
-        h_x = F.softmax(logit, 1).data.squeeze()
-        probs, idx = h_x.sort(0, True)
-        probs = probs.numpy()
-        idx = idx.numpy()
-
-        result = {"frame_result": []}
-        for i in range(0, self.topk):
-            label = {'label':{
-                'description': self.classes[idx[i]],
-                'score': float(probs[i]) * 100
-            }}
-            result['frame_result'].append(label)
-
-        return result
+        return self.result

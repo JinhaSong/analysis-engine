@@ -1,0 +1,17 @@
+amusementpark
+aquarium
+cafe
+exhibition
+hotel
+koreanhouse
+library
+market
+mountain
+palace
+park
+restaurant
+shoppingmall
+store
+street
+theater
+zoo

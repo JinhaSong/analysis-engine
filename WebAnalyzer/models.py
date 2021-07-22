@@ -63,14 +63,15 @@ class VideoModel(models.Model):
                 video_path = self.video_url
             else :
                 video_path = self.video.path
-            data, urls = extract_frames(video_path, self.extract_fps)
+            data, urls, frame_dir_path = extract_frames(video_path, self.extract_fps)
             # for frame_url in urls:
             #     self.frame.create(frame=frame_url)
 
             self.video_info = get_video_metadata(video_path)
             video_info = {
                 "video_info": self.video_info,
-                "frame_urls": urls
+                "frame_urls": urls,
+                "frame_dir_path": frame_dir_path
             }
 
         if DEBUG:
