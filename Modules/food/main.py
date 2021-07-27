@@ -11,6 +11,7 @@ from Modules.food.darknet import Darknet, post_processing
 from Modules.food.efficientnet import EfficientNet
 from Modules.dummy.main import Dummy
 from WebAnalyzer.utils.media import frames_to_timecode
+from utils import Logging
 
 def load_class_names(namesfile):
     class_names = []
@@ -147,7 +148,10 @@ class Food(Dummy):
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
         fps = video_info['extract_fps']
+        print(Logging.i("Start inference by video"))
         for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
+            if idx % 10 == 0:
+                print(Logging.i("inference frame - frame number: {} / path: {}".format(int((idx + 1) * fps), frame_path)))
             result = self.inference_by_image(frame_path)
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
             result["frame_number"] = int((idx + 1) * fps)

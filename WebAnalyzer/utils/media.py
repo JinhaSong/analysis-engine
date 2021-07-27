@@ -4,6 +4,7 @@ import os, datetime
 import subprocess
 import cv2
 from datetime import timedelta
+from utils import Logging
 
 def get_directory():
     date_today = datetime.date.today()
@@ -75,7 +76,7 @@ def extract_audio(video_url):
 
 def extract_frames(video_url, extract_fps):
     frame_dir_path, url = get_video_dir_path(video_url)
-
+    print(Logging.i("Frames extraction start."))
     command = "ffmpeg -y -hide_banner -loglevel panic -i {} -vsync 2 -q:v 0 -vf fps={} {}/%05d.jpg".format(video_url, extract_fps, frame_dir_path)
     os.system(command)
 
@@ -83,10 +84,10 @@ def extract_frames(video_url, extract_fps):
     frame_url_list = []
     frame_path_list = []
     for frame_num in range(1, framecount + 1):
-        path = settings.MEDIA_ROOT + os.path.join(url, "{0:05d}.{1}".format(frame_num,"jpg"))
+        path = os.path.join(settings.MEDIA_ROOT + "/" + url, "{0:05d}.{1}".format(frame_num,"jpg"))
         frame_url_list.append(os.path.join(url, str(frame_num) + ".jpg"))
         frame_path_list.append(path)
-
+    print(Logging.i("Frames extraction is successfully ended."))
     return frame_path_list, frame_url_list
 
 
