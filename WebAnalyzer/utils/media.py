@@ -70,7 +70,6 @@ def extract_audio(video_url):
     audio_path = os.path.join(dir_path, path)
     
     command = "ffmpeg -y -i {} {}".format(video_url, audio_path)
-    print(command)
     os.system(command)
 
     return url

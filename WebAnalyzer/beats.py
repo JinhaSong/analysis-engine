@@ -2,6 +2,7 @@ import os, shutil, datetime
 from AnalysisEngine.settings import MEDIA_ROOT
 from AnalysisEngine.celerys import app
 from WebAnalyzer import models
+from utils import Logging
 
 
 @app.task
@@ -28,9 +29,9 @@ def delete_old_database(days=0):
         if old_image_dir < date_point_dir:
             shutil.rmtree(os.path.join(MEDIA_ROOT, old_image_dir))
 
-    print("====================")
-    print(" Delete Old Image")
-    print(" - Date Point: {0}".format(date_point))
-    print("====================")
+    print(Logging.i("===================="))
+    print(Logging.s(" Delete Old Image"))
+    print(Logging.s(" - Date Point: {0}".format(date_point)))
+    print(Logging.s("===================="))
 
     return old_imagemodel_database_count + old_videomodel_database_count

@@ -43,7 +43,3 @@ class SECRET_KEY:
 
     def __str__(self):
         return self.value
-
-
-if __name__ == '__main__':
-    print(SECRET_KEY())
