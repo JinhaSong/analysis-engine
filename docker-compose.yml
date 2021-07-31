@@ -2,14 +2,17 @@ version: '2.3'
 
 services:
   main:
+    container_name: analysis-engine-main
     build:
       context: ./
       dockerfile: Dockerfile
     runtime: nvidia
     restart: always
     links:
+      - mysql
       - rabbitmq
     depends_on:
+      - mysql
       - rabbitmq
     env_file:
       - "docker-compose-env/main.env"
@@ -18,13 +21,28 @@ services:
     expose:
       - "8000"
       - "22"
+    volumes:
+      - ./media:/workspace/media
     ports:
       - "8001:8000"
       - "8022:22"
     stdin_open: true
     tty: true
+
+  mysql:
+    container_name: analysis-engine-mysql
+    image: mysql:latest
+    restart: always
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    env_file:
+      - "docker-compose-env/mysql.env"
+    expose:
+      - "3306"
+    volumes:
+      - ./mysql-data:/var/lib/mysql
   rabbitmq:
-    image: rabbitmq:latest
+    container_name: analysis-engine-rabbitmq
+    image: rabbitmq:3.8.14
     restart: always
     env_file:
       - "docker-compose-env/rabbitmq.env"

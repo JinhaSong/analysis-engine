@@ -5,6 +5,7 @@ Pillow==8.0.1
 kombu==4.6.10
 celery==4.4.7
 requests
+django-mysql
 mysqlclient==2.0.1
 mysql-connector
 mysql-connector-python

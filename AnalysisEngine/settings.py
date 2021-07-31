@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': 'module_db',
         'USER': 'admin',
         'PASSWORD': 'password',
-        'HOST': 'localhost',
+        'HOST': os.environ['MYSQL_HOST_ADDR'],
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4'
