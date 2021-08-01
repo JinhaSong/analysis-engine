@@ -1,11 +1,6 @@
-from Modules.audio.src.aed import preprob as aed_preprob
-from Modules.audio.src.aed import process as aed_process
-from Modules.audio.src.aed import feats as aed_feats
 from Modules.audio.src.asc import preprob as asc_preprob
 from Modules.audio.src.asc import process as asc_process
 from Modules.audio.src.asc import feats as asc_feats
-from Modules.audio.src.vad import read_wave, write_wave
-from Modules.audio.src.vad import frame_generator
 from utils import Logging
 
 import os
