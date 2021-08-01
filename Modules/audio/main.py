@@ -54,7 +54,7 @@ class AudioEventDetection:
                 result = ''.join(response.json()['hypotheses'][0]['utterance'])
                 response.close()
             module_result = {
-                'audio_url': '/media' + wavpath.split('/media')[1],
+                'audio_url': wavpath,
                 'audio_result': [{
                     'label': {
                         'description': result
