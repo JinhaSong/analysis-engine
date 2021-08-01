@@ -85,13 +85,9 @@ def extract_audio(video_url):
 
     ffmpeg_commands = [
         "ffmpeg -loglevel 8 -y -i {} -acodec pcm_s16le -ac 1 -ar 16000 {}".format(video_url, paths[0]), # aed(audio event detection)
-        'ffmpeg -loglevel 8 -y -i {} -acodec pcm_s16le -ac 1 -ar 48000 {}'.format(video_url, paths[1]),
-        'ffmpeg -loglevel 8 -y -i {} -acodec pcm_s16le -ac 1 -ar 16000 {}'.format(video_url, paths[2])
     ]
     sox_commands = [
         "sox --i {}".format(paths[0]),
-        "sox --i {}".format(paths[1]),
-        "sox --i {}".format(paths[2]),
     ]
 
     for ffmpeg, sox in zip(ffmpeg_commands, sox_commands) :
