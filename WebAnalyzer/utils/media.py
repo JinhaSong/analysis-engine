@@ -1,9 +1,14 @@
+import time
+
 from AnalysisEngine import settings
 
 import os, datetime
 import subprocess
 import cv2
 from datetime import timedelta
+
+from utils import Logging
+
 
 def get_directory():
     date_today = datetime.date.today()
@@ -47,29 +52,57 @@ def get_video_dir_path(video_url):
 
 def get_audio_filename(filename, ext):
     date_dir_path = os.path.join(settings.MEDIA_ROOT, get_directory())
-    path = os.path.join(settings.MEDIA_ROOT, get_directory(), filename + ext)
-    url = os.path.join(get_directory(), filename + "_"  + ext)
 
     if not os.path.exists(date_dir_path):
         os.mkdir(date_dir_path)
 
-    if not os.path.exists(path):
-        timestamp = get_timestamp()
-        url = os.path.join(get_directory(), filename + "_" + timestamp + ext)
-        path = os.path.join(settings.MEDIA_ROOT, get_directory(), filename + "_" + timestamp + ext)
+    timestamp = get_timestamp()
+    audio_sub_names = ["aed", "asc", "asr"]
+    paths = []
+    urls = []
+    sub_dirs = []
+    file_lists = []
+    video_dir = os.path.join(settings.MEDIA_ROOT, get_directory(), filename)
+    if not os.path.exists(video_dir):
+        os.mkdir(video_dir)
+    for sub_name in audio_sub_names:
+        path = os.path.join(video_dir, filename + "_" + sub_name + ext)
+        url = os.path.join(get_directory(), filename + "_" + sub_name + ext)
+        sub_dir = os.path.join(video_dir, sub_name)
+        file_list_path = os.path.join(video_dir, sub_name + '-files.txt')
+        if not os.path.exists(sub_dir):
+            os.mkdir(sub_dir)
+        paths.append(path)
+        urls.append(url)
+        sub_dirs.append(sub_dir)
+        file_lists.append(file_list_path)
 
-    return path, url
+    return paths, urls, sub_dirs, file_lists
 
 def extract_audio(video_url):
     video_name = get_filename(video_url)
-    dir_path = get_directory()
-    path, url = get_audio_filename(video_name, ".mp3")
-    audio_path = os.path.join(dir_path, path)
-    
-    command = "ffmpeg -y -i {} {}".format(video_url, audio_path)
-    os.system(command)
+    paths, urls, sub_dirs, file_lists = get_audio_filename(video_name, ".wav")
 
-    return url
+    ffmpeg_commands = [
+        "ffmpeg -loglevel 8 -y -i {} -acodec pcm_s16le -ac 1 -ar 16000 {}".format(video_url, paths[0]), # aed(audio event detection)
+        'ffmpeg -loglevel 8 -y -i {} -acodec pcm_s16le -ac 1 -ar 48000 {}'.format(video_url, paths[1]),
+        'ffmpeg -loglevel 8 -y -i {} -acodec pcm_s16le -ac 1 -ar 16000 {}'.format(video_url, paths[2])
+    ]
+    sox_commands = [
+        "sox --i {}".format(paths[0]),
+        "sox --i {}".format(paths[1]),
+        "sox --i {}".format(paths[2]),
+    ]
+
+    for ffmpeg, sox in zip(ffmpeg_commands, sox_commands) :
+        start_time = time.time()
+        print(Logging.i("Start extraction wav file from video"))
+        os.system(ffmpeg)
+        os.system(sox)
+        end_time = time.time()
+        print(Logging.i("Ended extraction(time: {})".format(end_time - start_time)))
+
+    return paths, sub_dirs, file_lists
 
 
 def extract_frames(video_url, extract_fps):
