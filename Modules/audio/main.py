@@ -47,6 +47,7 @@ class AudioEventDetection:
         segments = vad_collector(sample_rate, 30, 300, vad, frames)
         for i, segment in enumerate(segments):
             wavpath = os.path.join(sub_dir, '/chunk-%005d.wav'%(i))
+            print(Logging.i("{} - {}".format(i, wavpath)))
             write_wave(wavpath, segment, sample_rate)
             with open(wavpath, 'rb') as wav:
                 response = requests.post('https://speechapi.sogang.ac.kr:5013/client/dynamic/recognize', data=wav, verify=False,
