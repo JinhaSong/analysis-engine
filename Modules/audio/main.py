@@ -16,13 +16,8 @@ class AudioEventDetection:
 
     def __init__(self):
         model_dir = os.path.join(self.path, 'model')
-        self.aed_model_path = os.path.join(model_dir, '11model-035-0.6208-0.8758.tflite')
         self.asc_model_path = os.path.join(model_dir, '3model-183-0.3535-0.9388.tflite')
-
-        self.aed_model = tf.lite.Interpreter(model_path=self.aed_model_path)
         self.asc_model = tf.lite.Interpreter(model_path=self.asc_model_path)
-
-        self.aed_model.allocate_tensors()
         self.asc_model.allocate_tensors()
 
     def inference_by_audio(self, data, infos):
