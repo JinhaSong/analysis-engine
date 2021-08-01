@@ -10,3 +10,10 @@ mysqlclient==2.0.1
 mysql-connector
 mysql-connector-python
 opencv-python
+librosa==0.8.1
+numpy==1.19.5
+SoundFile==0.10.3.post1
+sox==1.4.1
+tensorflow-gpu==2.4.0
+urllib3==1.25.9
+webrtcvad==2.0.10

@@ -1,8 +1,9 @@
-FROM sogangmm/ubuntu:18.04-mysql-py3
+FROM nvidia/cuda:11.0-cudnn8-devel-ubuntu18.04
 
 RUN apt-get update \
     && apt-get -y install python3 python3-pip python3-dev \
     mysql-client libmysqlclient-dev python3-mysqldb \
+    sox \
     git wget ssh vim \
     apt-utils libgl1 ffmpeg \
     && rm -rf /var/lib/apt/lists/*

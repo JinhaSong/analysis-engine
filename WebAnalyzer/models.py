@@ -50,9 +50,16 @@ class VideoModel(models.Model):
         super(VideoModel, self).save(*args, **kwargs)
 
         if self.analysis_type == 'audio':
-            audio = self.audio.create()
-            data = audio.audio.path
-            video_info = {}
+            if self.video_url is not None:
+                video_path = self.video_url
+            else:
+                video_path = self.video.path
+            paths, sub_dirs, file_lists = extract_audio(video_path)
+            self.video_info = get_video_metadata(video_path)
+            data = {'paths': paths, 'sub_dirs': sub_dirs, 'file_lists': file_lists}
+            video_info = {
+                "video_info": self.video_info
+            }
 
         elif self.analysis_type == 'text':
             data = self.video_text
@@ -64,8 +71,6 @@ class VideoModel(models.Model):
             else :
                 video_path = self.video.path
             data, urls = extract_frames(video_path, self.extract_fps)
-            # for frame_url in urls:
-            #     self.frame.create(frame=frame_url)
 
             self.video_info = get_video_metadata(video_path)
             video_info = {
