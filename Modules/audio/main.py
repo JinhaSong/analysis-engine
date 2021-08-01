@@ -92,10 +92,10 @@ def vad_collector(sample_rate, frame_duration_ms, padding_duration_ms, vad, fram
             if num_unvoiced > 0.9 * ring_buffer.maxlen:
                 endtime = frame.timestamp + frame.duration
                 triggered = False
-                yield b''.join([f.bytes for f in voiced_frames]), starttime, endtime
+                return b''.join([f.bytes for f in voiced_frames]), starttime, endtime
                 ring_buffer.clear()
                 voiced_frames = []
     if triggered:
         endtime = frame.timestamp + frame.duration
     if voiced_frames:
-        yield b''.join([f.bytes for f in voiced_frames]), starttime, endtime
+        return b''.join([f.bytes for f in voiced_frames]), starttime, endtime
