@@ -29,7 +29,7 @@ class Places17(Dummy):
 
     def __init__(self):
         super().__init__()
-        model_name = 'resnet101-0722.pth.tar'
+        model_name = 'resnet101.pth.tar'
         classes_name = "classes.txt"
         model_path = os.path.join(self.path, model_name)
         classes_path = os.path.join(self.path, classes_name)

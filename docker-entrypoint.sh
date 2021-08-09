@@ -2,8 +2,7 @@
 set -e
 
 cd /workspace
-wget ftp://mldisk.sogang.ac.kr/hidf/places/places17/resnet101-0722.pth.tar -P /workspace/Modules/places/
-service mysql restart
+wget ftp://mldisk.sogang.ac.kr/hidf/places/places17/resnet101-0722.pth.tar -O /workspace/Modules/places/resnet101.pth.tar
 sh run_migration.sh
 
 python3 -c "import os

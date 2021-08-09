@@ -11,3 +11,5 @@ mysql-connector
 mysql-connector-python
 opencv-python
 torch==1.5.0
+torchvision==0.6.0
+pandas==1.1.5
