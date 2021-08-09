@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   main:
-    container_name: analysis-engine-main
+    container_name: hidf-engine-food_main
     build:
       context: ./
       dockerfile: Dockerfile
@@ -24,13 +24,13 @@ services:
     volumes:
       - ./media:/workspace/media
     ports:
-      - "8001:8000"
-      - "8022:22"
+      - "11002:8000"
+      - "11222:22"
     stdin_open: true
     tty: true
 
   mysql:
-    container_name: analysis-engine-mysql
+    container_name: hidf-engine-food_mysql
     image: mysql:latest
     restart: always
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
@@ -41,7 +41,7 @@ services:
     volumes:
       - ./mysql-data:/var/lib/mysql
   rabbitmq:
-    container_name: analysis-engine-rabbitmq
+    container_name: hidf-engine-food_rabbitmq
     image: rabbitmq:3.8.14
     restart: always
     env_file:
