@@ -25,7 +25,6 @@ ENV DJANGO_SUPERUSER_USERNAME root
 ENV DJANGO_SUPERUSER_EMAIL none@none.com
 ENV DJANGO_SUPERUSER_PASSWORD password
 
-COPY docker-compose-env/sshd_config /etc/ssh/sshd_config
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
