@@ -86,15 +86,11 @@ def extract_audio(video_url):
     ffmpeg_commands = [
         'ffmpeg -loglevel 8 -y -i {} -acodec pcm_s16le -ac 1 -ar 16000 {}'.format(video_url, paths[2])
     ]
-    sox_commands = [
-        "sox --i {}".format(paths[2]),
-    ]
 
-    for ffmpeg, sox in zip(ffmpeg_commands, sox_commands) :
+    for ffmpeg in ffmpeg_commands :
         start_time = time.time()
         print(Logging.i("Start extraction wav file from video"))
         os.system(ffmpeg)
-        os.system(sox)
         end_time = time.time()
         print(Logging.i("Ended extraction(time: {})".format(end_time - start_time)))
 

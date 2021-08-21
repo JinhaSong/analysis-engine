@@ -21,6 +21,7 @@ WORKDIR /workspace
 ADD . .
 RUN pip3 install -r requirements.txt
 
+ENV LC_ALL=C.UTF-8
 ENV DJANGO_SUPERUSER_USERNAME root
 ENV DJANGO_SUPERUSER_EMAIL none@none.com
 ENV DJANGO_SUPERUSER_PASSWORD password

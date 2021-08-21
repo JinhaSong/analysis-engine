@@ -1,15 +1,11 @@
-import datetime
+import ast
+import json
 
-import requests
-
-from Modules.audio.src.vad import read_wave, write_wave
-from Modules.audio.src.vad import frame_generator
 from utils import Logging
 
+import socket
 import os
-import collections
-import tensorflow as tf
-import webrtcvad
+import time
 
 class AudioEventDetection:
     model = None
@@ -36,67 +32,41 @@ class AudioEventDetection:
 
     def inference_asr(self, path, sub_dir):
         model_name = 'automatic_speech_recognition'
-        vad = webrtcvad.Vad(int(3))
         asr_results = {
             'model_name': model_name,
-            'model_result': []
+            'model_result': None
         }
-        audio, sample_rate = read_wave(path)
-        frames = frame_generator(30, audio, sample_rate)
-        frames = list(frames)
-        segments = vad_collector(sample_rate, 30, 300, vad, frames)
-        for i, segment in enumerate(segments):
-            wavpath = os.path.join(sub_dir, '/chunk-%005d.wav'%(i))
-            print(Logging.i("{} - {}".format(i, wavpath)))
-            write_wave(wavpath, segment, sample_rate)
-            with open(wavpath, 'rb') as wav:
-                response = requests.post('https://speechapi.sogang.ac.kr:5013/client/dynamic/recognize', data=wav, verify=False,
-                                    headers={'Connection': 'close'})
-                result = ''.join(response.json()['hypotheses'][0]['utterance'])
-                response.close()
-            module_result = {
-                'audio_url': wavpath,
-                'audio_result': [{
-                    'label': {
-                        'description': result
-                    }
-                }]
-            }
-            asr_results['model_result'].append(module_result)
+        start_time = time.time()
+        print(Logging.i("Start preprocessing"))
+
+        result = ''
+
+        try :
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect(('0.0.0.0', 10000))
+                data_transferred = 0
+
+                with open(path, 'rb') as f:
+                    try:
+                        data = f.read()  # 1024바이트 읽는다
+                        data_transferred = s.sendall(data)  # 1024바이트 보내고 크기 저장
+                    except Exception as ex:
+                        print(ex)
+                print(Logging.i("file transfer is successfully complete"))
+                rdata = s.recv(1024)
+                data_transferred = 0
+
+                try:
+                    while rdata:
+                        result += rdata.decode('utf-8')
+                        data_transferred += len(rdata)
+                        rdata = s.recv(1024)
+                except Exception as ex:
+                    print(ex)
+            asr_results['model_result'] = ast.literal_eval(result)
+            s.close()
+        except :
+            asr_results['model_result'] = []
+
         return asr_results
 
-
-def vad_collector(sample_rate, frame_duration_ms, padding_duration_ms, vad, frames):
-    num_padding_frames = int(padding_duration_ms / frame_duration_ms)
-    ring_buffer = collections.deque(maxlen=num_padding_frames)
-    triggered = False
-    voiced_frames = []
-
-    starttime = 0
-    endtime = 0
-    for frame in frames:
-        is_speech = vad.is_speech(frame.bytes, sample_rate)
-
-        if not triggered:
-            ring_buffer.append((frame, is_speech))
-            num_voiced = len([f for f, speech in ring_buffer if speech])
-            if num_voiced > 0.9 * ring_buffer.maxlen:
-                triggered = True
-                starttime = ring_buffer[0][0].timestamp
-                for f, s in ring_buffer:
-                    voiced_frames.append(f)
-                ring_buffer.clear()
-        else:
-            voiced_frames.append(frame)
-            ring_buffer.append((frame, is_speech))
-            num_unvoiced = len([f for f, speech in ring_buffer if not speech])
-            if num_unvoiced > 0.9 * ring_buffer.maxlen:
-                endtime = frame.timestamp + frame.duration
-                triggered = False
-                return b''.join([f.bytes for f in voiced_frames]), starttime, endtime
-                ring_buffer.clear()
-                voiced_frames = []
-    if triggered:
-        endtime = frame.timestamp + frame.duration
-    if voiced_frames:
-        return b''.join([f.bytes for f in voiced_frames]), starttime, endtime

@@ -3,6 +3,7 @@ set -e
 
 cd /workspace
 sh run_migration.sh
+sh run_asr_server.sh
 python3 -c "import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'AnalysisEngine.settings'
 import django
