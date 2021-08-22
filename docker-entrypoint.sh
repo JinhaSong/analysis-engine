@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+wget ftp://mldisk.sogang.ac.kr/vtt/cvip/efficientdet-d1_43_1247.pth -P /workspace/Modules/AGR_recognition/weights/
+wget ftp://mldisk.sogang.ac.kr/vtt/cvip/4_149.pth -P /workspace/Modules/AGR_recognition/weights/
+
 cd /workspace
 sh run_migration.sh
 python3 -c "import os
