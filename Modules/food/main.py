@@ -129,18 +129,18 @@ class Food(Dummy):
                 prob, indice = torch.topk(outputs.cpu(), k=1)
                 food_prob.extend(list(prob.numpy().flatten()))
                 food_indice.extend(list(indice.numpy().flatten()))
-                result["result"] = [
-                    {
-                        'label': {
-                            "description": self.food_classes[food_indice[i]],
-                            "score": food_prob[i] * 100,
-                        },
-                             "position": {"h": int(box[3] * h),
-                                          "w": int(box[2] * w),
-                                          "x": max(int(box[0] * w), 0),
-                                          "y": max(int(box[1] * h), 0)}
-                    } for i, box in enumerate(food_boxes) if food_prob[i] > cls_thr
-                ]
+            result["result"] = [
+                {
+                    'label': {
+                        "description": self.food_classes[food_indice[i]],
+                        "score": food_prob[i] * 100,
+                    },
+                         "position": {"h": int(box[3] * h),
+                                      "w": int(box[2] * w),
+                                      "x": max(int(box[0] * w), 0),
+                                      "y": max(int(box[1] * h), 0)}
+                } for i, box in enumerate(food_boxes) if food_prob[i] > cls_thr
+            ]
         return result
 
     def inference_by_video(self, frame_path_list, infos):
