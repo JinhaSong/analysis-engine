@@ -3,7 +3,7 @@ FROM nvidia/cuda:10.2-cudnn8-devel-ubuntu18.04
 RUN apt-get update \
     && apt-get -y install python3 python3-pip python3-dev \
     mysql-client libmysqlclient-dev python3-mysqldb \
-    git wget ssh vim default-jdk \
+    git wget ssh vim openjdk-8-jre openjdk-8-jdk \
     apt-utils libgl1 ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
