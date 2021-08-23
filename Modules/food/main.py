@@ -112,7 +112,7 @@ class Food(Dummy):
         # filtering food related bbox
         food_boxes = [box for box in boxes[0] if box[-1] in self.coco_food_related_idx]
 
-        result = {"food_detection": []}
+        result = {"result": []}
         if len(food_boxes):
             # crop bbox
             crop_imgs = [img.crop((int(box[0] * w), int(box[1] * h), int(box[2] * w), int(box[3] * h))) for box
@@ -129,26 +129,30 @@ class Food(Dummy):
                 prob, indice = torch.topk(outputs.cpu(), k=1)
                 food_prob.extend(list(prob.numpy().flatten()))
                 food_indice.extend(list(indice.numpy().flatten()))
-            result["food_detection"] = [
-                {
-                    'label': {
-                        "description": self.food_classes[food_indice[i]],
-                        "score": food_prob[i] * 100,
-                    },
-                         "position": {"h": int(box[3] * h),
-                                      "w": int(box[2] * w),
-                                      "x": max(int(box[0] * w), 0),
-                                      "y": max(int(box[1] * h), 0)}
-                } for i, box in enumerate(food_boxes) if food_prob[i] > cls_thr
-            ]
+                result["result"] = [
+                    {
+                        'label': {
+                            "description": self.food_classes[food_indice[i]],
+                            "score": food_prob[i] * 100,
+                        },
+                             "position": {"h": int(box[3] * h),
+                                          "w": int(box[2] * w),
+                                          "x": max(int(box[0] * w), 0),
+                                          "y": max(int(box[1] * h), 0)}
+                    } for i, box in enumerate(food_boxes) if food_prob[i] > cls_thr
+                ]
         return result
 
     def inference_by_video(self, frame_path_list, infos):
-        results = []
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
         fps = video_info['extract_fps']
         print(Logging.i("Start inference by video"))
+        results = {
+            "model_name": "food_detection", 
+            "model_result": []
+        }
+        
         for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
             if idx % 10 == 0:
                 print(Logging.i("inference frame - frame number: {} / path: {}".format(int((idx + 1) * fps), frame_path)))
@@ -156,7 +160,7 @@ class Food(Dummy):
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
             result["frame_number"] = int((idx + 1) * fps)
             result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
-            results.append(result)
+            results["model_result"].append(result)
 
         self.result = results
 
