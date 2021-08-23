@@ -4,6 +4,7 @@ import os, datetime
 import subprocess
 import cv2
 from datetime import timedelta
+from WebAnalyzer.utils.tube_mgr import YouTubeInfo
 
 def get_directory():
     date_today = datetime.date.today()
@@ -60,6 +61,7 @@ def get_audio_filename(filename, ext):
 
     return path, url
 
+
 def extract_audio(video_url):
     video_name = get_filename(video_url)
     dir_path = get_directory()
@@ -110,6 +112,17 @@ def get_video_metadata(video_path):
 
     return json_metadata
 
+
 def frames_to_timecode (frames, fps):
     td = timedelta(seconds=(frames / fps))
     return str(td)
+
+
+def get_text_from_youtubeurl(url):
+    if "youtube" in url:
+        info = YouTubeInfo()
+        info.set_youtube_url(url)
+        info.get_title()
+        return [info.get_title(), info.get_desc()]
+    else :
+        return []

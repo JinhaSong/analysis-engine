@@ -11,6 +11,7 @@ from AnalysisEngine.config import DEBUG
 from WebAnalyzer.tasks import analyzer_by_image, analyzer_by_video
 from WebAnalyzer.utils import filename
 from WebAnalyzer.utils.media import *
+from WebAnalyzer.utils.media import get_text_from_youtubeurl
 from django.db.models import JSONField
 import ast
 
@@ -55,7 +56,10 @@ class VideoModel(models.Model):
             video_info = {}
 
         elif self.analysis_type == 'text':
-            data = self.video_text
+            if "youtube" in str(self.video_url):
+                data = get_text_from_youtubeurl(str(self.video_url))
+            else:
+                data = [self.video_text]
             video_info = {}
 
         else :
@@ -64,8 +68,6 @@ class VideoModel(models.Model):
             else :
                 video_path = self.video.path
             data, urls = extract_frames(video_path, self.extract_fps)
-            # for frame_url in urls:
-            #     self.frame.create(frame=frame_url)
 
             self.video_info = get_video_metadata(video_path)
             video_info = {
