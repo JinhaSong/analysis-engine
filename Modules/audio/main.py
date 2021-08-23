@@ -39,7 +39,10 @@ class AudioEventDetection:
         model_name = 'audio_event_detection'
         aed_preprob(path, sub_dir, False)
         files = sorted([_ for _ in os.listdir(sub_dir) if _.endswith('.wav')])
-        aed_results = []
+        aed_results = {
+            'model_name': model_name,
+            'model_result': []
+        }
         for i, file in enumerate(files):
             if i % 50 == 0:
                 print(Logging.i("{} {}/{}".format(model_name, i, len(files))))
@@ -48,7 +51,6 @@ class AudioEventDetection:
             i = int(file.split('/')[-1].replace('.wav', ''))
             threshold = 0.5
             result = aed_process(i, threshold, logmel_data, self.aed_model, wavpath)
-            aed_results.append(result)
-
+            aed_results['model_result'].append(result)
             os.remove(wavpath)
         return aed_results
