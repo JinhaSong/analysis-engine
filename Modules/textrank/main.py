@@ -82,7 +82,7 @@ class TextRank:
         f1 = 0
         total = 1
         text_json_result_list = {
-            "text":data, "results": [{"text_rank": []}]
+            "text": data, "model_name": "text_rank", "model_result": []
         }
 
         for t_k in keyword_test_list:
@@ -118,7 +118,7 @@ class TextRank:
             for comp_i in range(len(compare_list)):
                 json_result_element = {"description": str(compare_list[comp_i]), "score": score_list[comp_i]}
                 text_json_result["label"].append(json_result_element)
-            text_json_result_list["results"][0]["text_rank"].append(text_json_result)
+            text_json_result_list["model_result"].append(text_json_result)
 
             total += 1
             if test_flag == 0 or test_flag == 2:
