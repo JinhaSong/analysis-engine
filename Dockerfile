@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.2-cudnn8-devel-ubuntu18.04
+FROM pytorch/pytorch:1.9.0-cuda10.2-cudnn7-devel
 
 RUN apt-get update \
     && apt-get -y install python3 python3-pip python3-dev \
