@@ -72,7 +72,7 @@ class Places17(Dummy):
 
         for i, (input, label) in enumerate(data_loader):
             if i % 10 == 0:
-                print(Logging.i("Processing... (index: {} / frame number: {} / path: {}".format(idx, int((idx + 1) * fps), frame_path)))
+                print(Logging.i("Processing... (index: {} / frame number: {} / path: {}".format(i, int((i + 1) * fps), frame_path)))
 
             self.model.eval()
             input = input.to(self.device)
