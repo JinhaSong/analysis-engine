@@ -55,7 +55,10 @@ class Places17(Dummy):
         print(Logging.i("Model is successfully loaded - {} sec".format(end_time - start_time)))
 
     def inference_by_video(self, frame_path_list, infos):
-        results = []
+        results = {
+            "model_name": "places_recognition",
+            "model_result": []
+        }
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
         frame_dir_path = infos['frame_dir_path']
@@ -80,15 +83,15 @@ class Places17(Dummy):
             result = {
                 "frame_number": int((i + 1) * fps),
                 "frame_url": file_path,
-                "frame_result": []
+                "result": []
             }
             for j in range(0, self.topk):
                 label = {'label': {
                     'description': self.classes[idx[j]],
                     'score': float(probs[j]) * 100,
                 }}
-                result['frame_result'].append(label)
-            results.append(result)
+                result['result'].append(label)
+            results["model_result"].append(result)
 
         # for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
         #     if idx % 10 == 0:
