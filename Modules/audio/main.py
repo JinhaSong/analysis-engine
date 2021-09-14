@@ -48,7 +48,7 @@ class AudioEventDetection:
         start_time = time.time()
         for i, file in enumerate(files):
             if i % 10 == 0:
-                print(Logging.i("Processing... (index: {}/{})".format(model_name, i, len(files))))
+                print(Logging.i("Processing... (index: {}/{})".format(i, len(files))))
             wavpath = os.path.join(sub_dir, file)
             logmel_data = asc_feats(wavpath)
             i = int(file.split('/')[-1].replace('.wav', ''))
