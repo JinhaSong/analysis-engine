@@ -27,7 +27,6 @@ class AudioEventDetection:
 
         result = []
 
-        # AED(Audio Event Detection)
         aed_result = self.inference_aed(paths[0], sub_dirs[0] + "/")
         result.append(aed_result)
 
@@ -41,11 +40,13 @@ class AudioEventDetection:
         files = sorted([_ for _ in os.listdir(sub_dir) if _.endswith('.wav')])
         aed_results = {
             'model_name': model_name,
+            'analysis_time': 0,
             'model_result': []
         }
+        start_time = time.time()
         for i, file in enumerate(files):
             if i % 50 == 0:
-                print(Logging.i("{} {}/{}".format(model_name, i, len(files))))
+                print(Logging.i("Processing... (index: {}/{})".format(model_name, i, len(files))))
             wavpath = os.path.join(sub_dir, file)
             logmel_data = aed_feats(wavpath)
             i = int(file.split('/')[-1].replace('.wav', ''))
@@ -53,4 +54,8 @@ class AudioEventDetection:
             result = aed_process(i, threshold, logmel_data, self.aed_model, wavpath)
             aed_results['model_result'].append(result)
             os.remove(wavpath)
+        end_time = time.time()
+        aed_results['analysis_time'] = end_time - start_time
+        print(Logging.i("Processing time: {}".format(aed_results['analysis_time'])))
+
         return aed_results
