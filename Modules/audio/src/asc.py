@@ -133,19 +133,18 @@ def process(i, threshold, logmel_data, model, wavpath):
 
     results = {
         'audio_url': '/media' + wavpath.split('/media')[1],
-        'start_time': str(time(round(i * 0.1, 1))),
-        'end_time': str(time(round(i+1 * 0.1, 1))),
-        'audio_result': []
+        'timestamp': str(time(round(i * 0.1, 1))),
+        'result': []
     }
     if unknown_flag == True:
-        results['audio_result'].append({
+        results['result'].append({
             'label': {
                 'score': str(0.0),
                 'description': 'unknown'
             }
         })
     else:
-        results['audio_result'].append({
+        results['result'].append({
             'label': {
                 'score': str(out_softmax[0][int(out_result)]),
                 'description': out_classes[int(out_result)][0]
