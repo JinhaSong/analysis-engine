@@ -2,9 +2,9 @@ import torch.nn as nn
 import torch
 from torchvision.ops.boxes import nms as nms_torch
 
-from Yet_Another_EfficientDet_Pytorch_master.efficientnet import EfficientNet as EffNet
-from Yet_Another_EfficientDet_Pytorch_master.efficientnet.utils import MemoryEfficientSwish, Swish
-from Yet_Another_EfficientDet_Pytorch_master.efficientnet.utils_extra import Conv2dStaticSamePadding, MaxPool2dStaticSamePadding
+from Modules.object_detection.efficientnet import EfficientNet as EffNet
+from Modules.object_detection.efficientnet.utils import MemoryEfficientSwish, Swish
+from Modules.object_detection.efficientnet.utils_extra import Conv2dStaticSamePadding, MaxPool2dStaticSamePadding
 
 
 
