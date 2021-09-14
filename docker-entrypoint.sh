@@ -2,6 +2,7 @@
 set -e
 
 cd /workspace
+wget ftp://mldisk.sogang.ac.kr/hidf/object_detection/efficientdet-d6.pth -P /workspace/Modules/object_detection/model
 sh run_migration.sh
 python3 -c "import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'AnalysisEngine.settings'
