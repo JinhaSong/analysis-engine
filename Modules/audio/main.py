@@ -34,11 +34,12 @@ class AudioEventDetection:
         model_name = 'automatic_speech_recognition'
         asr_results = {
             'model_name': model_name,
+            'analysis_time': 0,
             'model_result': None
         }
-        start_time = time.time()
         print(Logging.i("Start preprocessing"))
 
+        start_time = time.time()
         result = ''
 
         try :
@@ -65,8 +66,12 @@ class AudioEventDetection:
                     print(ex)
             asr_results['model_result'] = ast.literal_eval(result)
             s.close()
+
         except :
             asr_results['model_result'] = []
+        end_time = time.time()
+        asr_results['analysis_time'] = end_time - start_time
+        print(Logging.i("Processing time: {}".format(asr_results['analysis_time'])))
 
         return asr_results
 
