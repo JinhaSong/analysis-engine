@@ -7,13 +7,15 @@ import socket
 import os
 import time
 
-class AudioEventDetection:
+class AutomaticSpeechRecognition:
     model = None
     result = None
     path = os.path.dirname(os.path.abspath(__file__))
 
     def __init__(self):
-        model_dir = os.path.join(self.path, 'model')
+        start_time = time.time()
+        end_time = time.time()
+        print(Logging.i("Model is successfully loaded - {} sec".format(end_time - start_time)))
 
     def inference_by_audio(self, data, infos):
         paths = data['paths']

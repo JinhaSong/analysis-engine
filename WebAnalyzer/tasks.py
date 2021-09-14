@@ -25,8 +25,8 @@ def module_load_init(**__):
     #   - Add your model
     #   - You can use worker_index if you need to get and set gpu_id
     #       - ex) gpu_id = worker_index % TOTAL_GPU_NUMBER
-    from Modules.audio.main import AudioEventDetection
-    analyzer = AudioEventDetection()
+    from Modules.audio.main import AutomaticSpeechRecognition
+    analyzer = AutomaticSpeechRecognition()
 
 
 @app.task
