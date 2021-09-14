@@ -4,6 +4,7 @@ from torchvision.datasets.folder import default_loader
 import os
 import torch
 import torch.nn as nn
+import time
 from torch.utils.data import Dataset, DataLoader
 
 from AnalysisEngine import settings
@@ -149,10 +150,12 @@ class Food(Dummy):
         fps = video_info['extract_fps']
         print(Logging.i("Start inference by video"))
         results = {
-            "model_name": "food_detection", 
+            "model_name": "food_detection",
+            "analysis_time": 0,
             "model_result": []
         }
-        
+
+        start_time = time.time()
         for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
             if idx % 10 == 0:
                 print(Logging.i("inference frame - frame number: {} / path: {}".format(int((idx + 1) * fps), frame_path)))
@@ -161,6 +164,10 @@ class Food(Dummy):
             result["frame_number"] = int((idx + 1) * fps)
             result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
             results["model_result"].append(result)
+
+        end_time = time.time()
+        results['analysis_time'] = end_time - start_time
+        print(Logging.i("Processing time: {}".format(results['analysis_time'])))
 
         self.result = results
 
