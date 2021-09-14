@@ -112,7 +112,7 @@ class Food(Dummy):
         # filtering food related bbox
         food_boxes = [box for box in boxes[0] if box[-1] in self.coco_food_related_idx]
 
-        result = {"food_detection": []}
+        result = {"result": []}
         if len(food_boxes):
             # crop bbox
             crop_imgs = [img.crop((int(box[0] * w), int(box[1] * h), int(box[2] * w), int(box[3] * h))) for box
@@ -129,7 +129,7 @@ class Food(Dummy):
                 prob, indice = torch.topk(outputs.cpu(), k=1)
                 food_prob.extend(list(prob.numpy().flatten()))
                 food_indice.extend(list(indice.numpy().flatten()))
-            result["food_detection"] = [
+            result["result"] = [
                 {
                     'label': {
                         "description": self.food_classes[food_indice[i]],
