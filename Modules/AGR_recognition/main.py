@@ -18,7 +18,7 @@ from WebAnalyzer.utils.media import frames_to_timecode
 from utils import Logging
 
 
-class ARG_recognition(Dummy):
+class AGR_recognition(Dummy):
     model = None
     result = None
     path = os.path.dirname(os.path.abspath(__file__))
@@ -115,7 +115,7 @@ class ARG_recognition(Dummy):
             }
         }
 
-        results = {"age_gender_race_recognition": []}
+        results = {"result": []}
         inference_image = copy.deepcopy(image)
 
         if out != None :
@@ -207,24 +207,34 @@ class ARG_recognition(Dummy):
                 each_bbox['position']['h'] = int(y2-y1)
 
                 deep_copy = copy.deepcopy(each_bbox)
-                results["age_gender_race_recognition"].append(deep_copy)
+                results["result"].append(deep_copy)
 
         return results
 
     def inference_by_video(self, frame_path_list, infos):
-        results = []
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
         fps = video_info['extract_fps']
+
         print(Logging.i("Start inference by video"))
+        results = {
+            "model_name": "age_gender_race_recognition",
+            "analysis_time": 0,
+            "model_result": []
+        }
+
+        start_time = time.time()
         for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
             if idx % 10 == 0:
-                print(Logging.i("inference frame - frame number: {} / path: {}".format(int((idx + 1) * fps), frame_path)))
+                print(Logging.i("Processing... (index: {}/{} / frame number: {} / path: {})".format(idx, len(frame_path_list), int((idx + 1) * fps), frame_path)))
             result = self.inference_by_image(frame_path)
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
             result["frame_number"] = int((idx + 1) * fps)
             result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
-            results.append(result)
+            results["model_result"].append(result)
+        end_time = time.time()
+        results['analysis_time'] = end_time - start_time
+        print(Logging.i("Processing time: {}".format(results['analysis_time'])))
 
         self.result = results
 
