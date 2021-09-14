@@ -30,6 +30,7 @@ class Places17(Dummy):
 
     def __init__(self):
         super().__init__()
+        start_time = time.time()
         model_name = 'resnet101.pth.tar'
         classes_name = "classes.txt"
         model_path = os.path.join(self.path, model_name)
@@ -38,7 +39,7 @@ class Places17(Dummy):
         self.topk = 5
         self.result = None
         print(Logging.i("Start loading model({})".format(model_name)))
-        start_time = time.time()
+
         self.device = torch.device("cuda:0")
         self.classes = label_map(classes_path)
         state = torch.load(model_path, map_location='cuda:0')
