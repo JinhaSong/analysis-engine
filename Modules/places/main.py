@@ -71,6 +71,9 @@ class Places17(Dummy):
         allFiles, _ = map(list, zip(*data_loader.dataset.samples))
 
         for i, (input, label) in enumerate(data_loader):
+            if i % 10 == 0:
+                print(Logging.i("Processing... (index: {} / frame number: {} / path: {}".format(idx, int((idx + 1) * fps), frame_path)))
+
             self.model.eval()
             input = input.to(self.device)
 
@@ -92,15 +95,6 @@ class Places17(Dummy):
                 }}
                 result['result'].append(label)
             results["model_result"].append(result)
-
-        # for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
-        #     if idx % 10 == 0:
-        #         print(Logging.i("inference frame - frame number: {} / path: {}".format(int((idx + 1) * fps), frame_path)))
-        #     result = self.inference_by_image(frame_path)
-        #     result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
-        #     result["frame_number"] = int((idx + 1) * fps)
-        #     result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
-        #     results.append(result)
 
         self.result = results
 
