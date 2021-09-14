@@ -41,11 +41,13 @@ class AudioEventDetection:
         files = sorted([_ for _ in os.listdir(sub_dir) if _.endswith('.wav')])
         asc_results = {
             'model_name': model_name,
+            'analysis_time': 0,
             'model_result': []
         }
+        start_time = time.time()
         for i, file in enumerate(files):
             if i % 10 == 0:
-                print(Logging.i("{} {}/{}".format(model_name, i, len(files))))
+                print(Logging.i("Processing... (index: {}/{})".format(model_name, i, len(files))))
             wavpath = os.path.join(sub_dir, file)
             logmel_data = asc_feats(wavpath)
             i = int(file.split('/')[-1].replace('.wav', ''))
@@ -53,4 +55,8 @@ class AudioEventDetection:
             result = asc_process(i, threshold, logmel_data, self.asc_model, wavpath)
             asc_results['model_result'].append(result)
             os.remove(wavpath)
+        end_time = time.time()
+        asc_results['analysis_time'] = end_time - start_time
+        print(Logging.i("Processing time: {}".format(asc_results['analysis_time'])))
+
         return asc_results
