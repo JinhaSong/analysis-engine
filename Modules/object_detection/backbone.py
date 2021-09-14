@@ -5,8 +5,8 @@ from torch import nn
 import torch.cuda as cutorch
 
 
-from Yet_Another_EfficientDet_Pytorch_master.efficientdet.model import BiFPN, Regressor, Classifier, EfficientNet
-from Yet_Another_EfficientDet_Pytorch_master.efficientdet.utils import Anchors
+from Modules.object_detection.efficientdet.model import BiFPN, Regressor, Classifier, EfficientNet
+from Modules.object_detection.efficientdet.utils import Anchors
 
 
 
