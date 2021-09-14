@@ -70,6 +70,7 @@ class ObjectDetection(Dummy):
 
         self.model = model
         end_time = time.time()
+        print(Logging.i("Model is successfully loaded - {} sec".format(end_time - start_time)))
         
 
     def inference_by_image(self, image_path):
@@ -89,21 +90,8 @@ class ObjectDetection(Dummy):
             return out
         
         out = inference()
-        each_bbox_multiple_object = {
-            'label': [
-                {'description': '', 'score': 0.0},
-                {'description': '', 'score': 0.0}
-            ],
-            'position': {
-                'x': 0.0,
-                'y': 0.0,
-                'w': 0.0,
-                'h': 0.0
-            }
-        }
 
         each_bbox = {
-            # 1 bbox & 1 object
             'label':
                 [{'description': 'None', 'score': 0.0}],
 
@@ -118,7 +106,6 @@ class ObjectDetection(Dummy):
         result = {"video_result": None}
         object_detection = []
         if out != None :
-            object_detection.append(each_bbox_multiple_object)
             for i in range(len(out[0]['rois'])) :
                 x1,y1,x2,y2 = out[0]['rois'][i].astype(np.int)
                 obj = self.obj_list[out[0]['class_ids'][i]]
@@ -133,7 +120,7 @@ class ObjectDetection(Dummy):
 
                 deep_copy = copy.deepcopy(each_bbox)
                 object_detection.append(deep_copy)
-        result["video_result"] = object_detection
+        result["result"] = object_detection
         self.result = result
         return self.result
 
