@@ -4,6 +4,8 @@ import os, datetime
 import subprocess
 import cv2
 from datetime import timedelta
+from utils import Logging
+
 
 def get_directory():
     date_today = datetime.date.today()
@@ -29,13 +31,13 @@ def get_video_dir_path(video_url):
     if "http" in video_url:
         dir_path = os.path.join(settings.MEDIA_ROOT, get_directory(), str(video_url).split("/")[-1]).split(".")[0]
         url = os.path.join(get_directory(), str(video_url).split("/")[-1]).split(".")[0]
-    else :
+    else:
         dir_path = video_url.split(".")[0]
         url = dir_path.replace(settings.MEDIA_ROOT, "")
 
-    if not os.path.exists(dir_path) :
+    if not os.path.exists(dir_path):
         os.mkdir(dir_path)
-    else :
+    else:
         timestamp = get_timestamp()
         dir_path = dir_path + "_" + timestamp
         url = dir_path.replace(settings.MEDIA_ROOT, "")
@@ -48,7 +50,7 @@ def get_video_dir_path(video_url):
 def get_audio_filename(filename, ext):
     date_dir_path = os.path.join(settings.MEDIA_ROOT, get_directory())
     path = os.path.join(settings.MEDIA_ROOT, get_directory(), filename + ext)
-    url = os.path.join(get_directory(), filename + "_"  + ext)
+    url = os.path.join(get_directory(), filename + "_" + ext)
 
     if not os.path.exists(date_dir_path):
         os.mkdir(date_dir_path)
@@ -60,12 +62,13 @@ def get_audio_filename(filename, ext):
 
     return path, url
 
+
 def extract_audio(video_url):
     video_name = get_filename(video_url)
     dir_path = get_directory()
     path, url = get_audio_filename(video_name, ".mp3")
     audio_path = os.path.join(dir_path, path)
-    
+
     command = "ffmpeg -y -i {} {}".format(video_url, audio_path)
     os.system(command)
 
@@ -74,18 +77,20 @@ def extract_audio(video_url):
 
 def extract_frames(video_url, extract_fps):
     frame_dir_path, url = get_video_dir_path(video_url)
-
-    command = "ffmpeg -y -hide_banner -loglevel panic -i {} -vsync 2 -q:v 0 -vf fps={} {}/%05d.jpg".format(video_url, extract_fps, frame_dir_path)
+    print(Logging.i("Frames extraction start."))
+    command = "ffmpeg -y -hide_banner -loglevel panic -i {} -vsync 2 -q:v 0 -vf fps={} {}/%05d.jpg".format(video_url,
+                                                                                                           extract_fps,
+                                                                                                           frame_dir_path)
     os.system(command)
 
     framecount = len(os.listdir(frame_dir_path))
     frame_url_list = []
     frame_path_list = []
     for frame_num in range(1, framecount + 1):
-        path = settings.MEDIA_ROOT + os.path.join(url, "{0:05d}.{1}".format(frame_num,"jpg"))
+        path = os.path.join(settings.MEDIA_ROOT + "/" + url, "{0:05d}.{1}".format(frame_num, "jpg"))
         frame_url_list.append(os.path.join(url, str(frame_num) + ".jpg"))
         frame_path_list.append(path)
-
+    print(Logging.i("Frames extraction is successfully ended."))
     return frame_path_list, frame_url_list
 
 
@@ -110,6 +115,7 @@ def get_video_metadata(video_path):
 
     return json_metadata
 
-def frames_to_timecode (frames, fps):
+
+def frames_to_timecode(frames, fps):
     td = timedelta(seconds=(frames / fps))
     return str(td)
