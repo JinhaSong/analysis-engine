@@ -61,8 +61,14 @@ class TextRank:
         return hangul.sub('', text)
 
     def inference_by_text(self, data, video_info):
-        result = {'text_result': []}
+        results = {
+            "text": data,
+            "model_name": "text_rank",
+            "analysis_time": 0,
+            "model_result": []
+        }
 
+        start_time = time.time()
         test_flag = 1
         keyword_test_list = []
 
@@ -81,9 +87,6 @@ class TextRank:
 
         f1 = 0
         total = 1
-        text_json_result_list = {
-            "text": data, "model_name": "text_rank", "model_result": []
-        }
 
         for t_k in keyword_test_list:
             compare_list = []
@@ -112,13 +115,11 @@ class TextRank:
                             compare_list.append(word)
                             score_list.pop()
                             score_list.append(rank)
-                result_element = {'label': [{'description': str(compare_list[0]), 'score': score_list[0]}]}
-                result['text_result'].append(result_element)
 
             for comp_i in range(len(compare_list)):
                 json_result_element = {"description": str(compare_list[comp_i]), "score": score_list[comp_i]}
                 text_json_result["label"].append(json_result_element)
-            text_json_result_list["model_result"].append(text_json_result)
+            results["model_result"].append(text_json_result)
 
             total += 1
             if test_flag == 0 or test_flag == 2:
@@ -128,7 +129,10 @@ class TextRank:
                     if word in answer_words:
                         f1 += 1
                         break
+        end_time = time.time()
+        results['analysis_time'] = end_time - start_time
+        print(Logging.i("Processing time: {}".format(results['analysis_time'])))
 
-        self.result = text_json_result_list
+        self.result = results
 
         return self.result
