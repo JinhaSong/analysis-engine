@@ -13,12 +13,15 @@ class AudioEventDetection:
     path = os.path.dirname(os.path.abspath(__file__))
 
     def __init__(self):
+        start_time = time.time()
         model_dir = os.path.join(self.path, 'model')
         self.aed_model_path = os.path.join(model_dir, '11model-035-0.6208-0.8758.tflite')
 
         self.aed_model = tf.lite.Interpreter(model_path=self.aed_model_path)
 
         self.aed_model.allocate_tensors()
+        end_time = time.time()
+        print(Logging.i("Model is successfully loaded - {} sec".format(end_time - start_time)))
 
     def inference_by_audio(self, data, infos):
         paths = data['paths']
