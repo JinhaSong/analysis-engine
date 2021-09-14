@@ -73,36 +73,46 @@ class ImageCaptioning:
         tmp_image = coco.val_transform(image).unsqueeze(0)
         result, flag = self.inference(tmp_image)
 
-        frame_result = {"image_captioning": []}
-        frame_result["image_captioning"] = {
+        frame_result = {"result": []}
+        frame_result["result"].append({
             "label": [
                 {
-                    "description":"example text",
+                    "description": result,
                     "score": None
                 },
             ],
-        }
-
-        frame_result["image_captioning"]['label'][0]['description'] = result
+        })
 
         return frame_result
 
     def inference_by_video(self, frame_path_list, infos):
-        results = []
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
         fps = video_info['extract_fps']
+
+        print(Logging.i("Start inference by video"))
+        results = {
+            "model_name": "image_captioning",
+            "analysis_time": 0,
+            "model_result": []
+        }
+
+        start_time = time.time()
         for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
+            if (idx % 50) == 0 and idx != 0:
+                print(Logging.i("Processing...(frame number: {})".format(idx)))
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 result = self.inference_by_image(frame_path)
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
             result["frame_number"] = int((idx + 1) * fps)
             result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
-            results.append(result)
-            if (idx % 50) == 0 and idx != 0:
-                print(Logging.i("Processing...(frame number: {})".format(idx)))
+            results["model_result"].append(result)
 
-        self.result = {'video_result': results}
+        end_time = time.time()
+        results['analysis_time'] = end_time - start_time
+        print(Logging.i("Processing time: {}".format(results['analysis_time'])))
+
+        self.result = results
 
         return self.result
