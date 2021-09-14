@@ -57,6 +57,8 @@ class Food(Dummy):
 
     def __init__(self):
         super().__init__()
+        start_time = time.time()
+
         yolo_weight_path = os.path.join(self.path, 'yolov4.weights')
         yolo_cfg_path = os.path.join(self.path, 'yolov4.cfg')
         classifier_weight_path = os.path.join(self.path, 'efficient.pt')
@@ -76,6 +78,9 @@ class Food(Dummy):
                                                 trn.ToTensor(),
                                                 trn.Normalize([0.485, 0.456, 0.406],
                                                               [0.229, 0.224, 0.225])])
+
+        end_time = time.time()
+        print(Logging.i("Model is successfully loaded - {} sec".format(end_time - start_time)))
 
     def load_detector(self, yolo_cfg, yolo_weight, parallel=True):
         detector = Darknet(yolo_cfg)
