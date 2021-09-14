@@ -23,6 +23,7 @@ from Modules.dummy.main import Dummy
 from WebAnalyzer.utils.media import frames_to_timecode
 from utils import Logging
 from Modules.places.metrictracker import label_map
+import time
 
 class Places17(Dummy):
     path = os.path.dirname(os.path.abspath(__file__))
@@ -57,6 +58,7 @@ class Places17(Dummy):
     def inference_by_video(self, frame_path_list, infos):
         results = {
             "model_name": "places_recognition",
+            "analysis_time": 0,
             "model_result": []
         }
         video_info = infos['video_info']
@@ -65,6 +67,7 @@ class Places17(Dummy):
         fps = video_info['extract_fps']
         print(Logging.i("Start inference by video"))
 
+        start_time = time.time()
         datasets = ImageFolder(frame_dir_path, transform=self.transforms, target_transform=None)
         data_loader = DataLoader(datasets, batch_size=1, shuffle=False, num_workers=1)
 
@@ -95,6 +98,10 @@ class Places17(Dummy):
                 }}
                 result['result'].append(label)
             results["model_result"].append(result)
+
+        end_time = time.time()
+        results['analysis_time'] = end_time - start_time
+        print(Logging.i("Processing time: {}".format(results['analysis_time'])))
 
         self.result = results
 
