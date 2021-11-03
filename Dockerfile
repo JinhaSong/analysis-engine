@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.2-cudnn8-devel-ubuntu18.04
+FROM nvidia/cuda:11.1-cudnn8-devel-ubuntu18.04
 
 RUN apt-get update \
     && apt-get -y install python3 python3-pip python3-dev \
@@ -18,6 +18,7 @@ RUN pip3 install setuptools
 
 WORKDIR /workspace
 ADD . .
+RUN pip3 install torch==1.9.1+cu111 torchvision==0.10.1+cu111 torchaudio===0.9.1 -f https://download.pytorch.org/whl/torch_stable.html
 RUN pip3 install -r requirements.txt
 
 ENV DJANGO_SUPERUSER_USERNAME root
