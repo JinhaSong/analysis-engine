@@ -2,9 +2,9 @@
 set -e
 
 cd /workspace
-wget ftp://mldisk.sogang.ac.kr/hidf/scene_text/best_accuracy.pth -P /workspace/Modules/scenetext/weights
-wget ftp://mldisk.sogang.ac.kr/hidf/scene_text/craft_mlt_25k.pth -P /workspace/Modules/scenetext/weights
-wget ftp://mldisk.sogang.ac.kr/hidf/scene_text/craft_refiner_CTW1500.pth -P /workspace/Modules/scenetext/weights
+wget ftp://mldisk.sogang.ac.kr/hidf/scene_text_recognition/best_accuracy.pth -P /workspace/Modules/scenetext/weights
+wget ftp://mldisk.sogang.ac.kr/hidf/scene_text_recognition/craft_mlt_25k.pth -P /workspace/Modules/scenetext/weights
+wget ftp://mldisk.sogang.ac.kr/hidf/scene_text_recognition/craft_refiner_CTW1500.pth -P /workspace/Modules/scenetext/weights
 
 sh run_migration.sh
 python3 -c "import os
