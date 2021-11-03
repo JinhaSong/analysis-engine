@@ -20,7 +20,6 @@ from Modules.scenetext.modules.transformation import TPS_SpatialTransformerNetwo
 from Modules.scenetext.modules.feature_extraction import VGG_FeatureExtractor, RCNN_FeatureExtractor, ResNet_FeatureExtractor
 from Modules.scenetext.modules.sequence_modeling import BidirectionalLSTM
 from Modules.scenetext.modules.prediction import Attention
-
 # from modules.transformation import TPS_SpatialTransformerNetwork
 # from modules.feature_extraction import VGG_FeatureExtractor, RCNN_FeatureExtractor, ResNet_FeatureExtractor
 # from modules.sequence_modeling import BidirectionalLSTM
@@ -35,11 +34,8 @@ class Model(nn.Module):
         self.stages = {'Trans': opt['Transformation'], 'Feat': opt['FeatureExtraction'],
                        'Seq': opt['SequenceModeling'], 'Pred': opt['Prediction']}
         """ Transformation """
-        if opt['Transformation'] == 'TPS':
-            self.Transformation = TPS_SpatialTransformerNetwork(
+        self.Transformation = TPS_SpatialTransformerNetwork(
                 F=opt['num_fiducial'], I_size=(opt['imgH'], opt['imgW']), I_r_size=(opt['imgH'], opt['imgW']), I_channel_num=input_channel)
-        else:
-            print('No Transformation module specified')
 
         """ FeatureExtraction """
         if opt['FeatureExtraction'] == 'VGG':

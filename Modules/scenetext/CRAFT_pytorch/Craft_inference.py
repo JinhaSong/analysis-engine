@@ -14,7 +14,6 @@ import shutil
 # import file_utils
 # import new_test
 # from craft import CRAFT
-
 from Modules.scenetext import file_utils
 from Modules.scenetext.craft import CRAFT
 from Modules.scenetext import new_test
@@ -82,18 +81,16 @@ def generate_words(image_name, score_bbox, image, base_dir, imwrite = True):
 
         folder = '/'.join( image_name.split('/')[:-1])
 
-
-
         # if os.path.isdir(os.path.join(dir + folder)) == False :
         #   os.makedirs(os.path.join(dir + folder))
         crop_images.append(word)
-
         if imwrite == True :
-          try:
-            file_name = os.path.join(dir + image_name)
-            cv2.imwrite(file_name+'_{}_{}_{}_{}_{}_{}_{}_{}.jpg'.format(l_t, t_l, r_t ,t_r, r_b , b_r ,l_b, b_l), word)
-          except:
-            continue
+            file_name = os.path.join(dir, image_name + '_{}_{}_{}_{}_{}_{}_{}_{}.jpg'.format(l_t, t_l, r_t ,t_r, r_b , b_r ,l_b, b_l))
+            try :
+                cv2.imwrite(file_name, word)
+            except:
+                pass
+
   return crop_images
 
 def image_crop(image, data, base_dir):
@@ -112,6 +109,9 @@ image_names = []
 image_paths = []
 
 def inference_one_image(net, refine_net, image, current_frame, base_dir):
+    if not os.path.exists(base_dir):
+        os.mkdir(base_dir)
+
     csv_path = os.path.join(base_dir, 'data.csv')
     data=pd.DataFrame(columns=['image_name', 'word_bboxes', 'pred_words', 'align_text'])
     data['image_name'] = [str(current_frame)+".jpg"]
@@ -133,7 +133,7 @@ def inference_one_image(net, refine_net, image, current_frame, base_dir):
     detect_box_img = file_utils.saveResult(int(current_frame), image[:,:,::-1], polys, dirname=base_dir, imwrite = True)
     data.to_csv(csv_path, sep = ',', na_rep='Unknown')
 
-    return bboxes, polys, score_text, det_scores ,data , detect_box_img
+    return bboxes, polys, score_text, det_scores, data, detect_box_img
 
 
 def load_craft_weights() :

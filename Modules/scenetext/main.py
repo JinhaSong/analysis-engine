@@ -108,7 +108,6 @@ class SceneText:
             i = 0
 
             for image_tensors, image_path_list in demo_loader:
-                print("image_path_list", image_path_list)
                 iter_check = iter_check + 1
                 batch_size = image_tensors.size(0)
                 image = image_tensors.to(self.device)
@@ -130,46 +129,49 @@ class SceneText:
 
                 preds_prob = F.softmax(preds, dim=2)
                 preds_max_prob, _ = preds_prob.max(dim=2)
+                if len(bboxes) > 0:
+                    for img_name, pred, pred_max_prob in zip(image_path_list, preds_str, preds_max_prob):
+                        try :
+                            if 'Attn' in self.opt['Prediction']:
+                                pred_EOS = pred.find('[s]')
+                                pred = pred[:pred_EOS]  # prune after "end of sentence" token ([s])
+                                pred_max_prob = pred_max_prob[:pred_EOS]
 
-                for img_name, pred, pred_max_prob in zip(image_path_list, preds_str, preds_max_prob):
-                    if 'Attn' in self.opt['Prediction']:
-                        pred_EOS = pred.find('[s]')
-                        pred = pred[:pred_EOS]  # prune after "end of sentence" token ([s])
-                        pred_max_prob = pred_max_prob[:pred_EOS]
+                            confidence_score = pred_max_prob.cumprod(dim=0)[-1]
 
-                    confidence_score = pred_max_prob.cumprod(dim=0)[-1]
+                            bbox = bboxes[i]
+                            bbox_coordinate = bbox
 
-                    bbox = bboxes[i]
-                    bbox_coordinate = bbox
+                            confidence = confidence_score.detach().cpu().numpy()
 
-                    confidence = confidence_score.detach().cpu().numpy()
+                            left_top = bbox_coordinate[0]
+                            left_top = list(map(int,left_top))
+                            right_bottom = bbox_coordinate[2]
+                            right_bottom = list(map(int,right_bottom))
 
-                    left_top = bbox_coordinate[0]
-                    left_top = list(map(int,left_top))
-                    right_bottom = bbox_coordinate[2]
-                    right_bottom = list(map(int,right_bottom))
+                            x = left_top[0]
+                            w = x + left_top[1]
+                            y = right_bottom[0]
+                            h = y + right_bottom[1]
+                            score = float(confidence)
 
-                    x = left_top[0]
-                    w = x + left_top[1]
-                    y = right_bottom[0]
-                    h = y + right_bottom[1]
-                    score = confidence
-
-                    result = {
-                        'label':[
-                            {
-                                'description': pred,
-                                'score': score
+                            result = {
+                                'label':[
+                                    {
+                                        'description': pred,
+                                        'score': score
+                                    }
+                                ],
+                                'position': {
+                                    'x': x,
+                                    'y': y,
+                                    'w': w,
+                                    'h': h
+                                }
                             }
-                        ],
-                        'position': {
-                            'x': x,
-                            'y': y,
-                            'w': w,
-                            'h': h
-                        }
-                    }
-                    results.append(result)
+                            results.append(result)
+                        except:
+                            pass
 
         return results
 
@@ -190,7 +192,7 @@ class SceneText:
         image = cv2.imread(image_path)
 
         result = {}
-        base_dir = image_path.replace(image_path, ".jpg")
+        base_dir = image_path.replace(".jpg", "")
         if not os.path.exists(base_dir):
             os.makedirs(base_dir)
 

@@ -15,6 +15,7 @@ import cv2
 import numpy as np
 from Modules.scenetext import imgproc
 from Modules.scenetext import craft_utils
+# import imgproc
 # import craft_utils
 
 from collections import OrderedDict
