@@ -37,4 +37,3 @@ pandas
 lmdb
 natsort==7.1.1
 scikit-image==0.17.2
-imgproc
