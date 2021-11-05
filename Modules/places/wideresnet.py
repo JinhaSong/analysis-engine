@@ -127,7 +127,7 @@ def resnet50(pretrained=False, **kwargs):
         #print(model)
         print("Hello")
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, 17)
+    model.fc = nn.Linear(num_ftrs, 16)
     return model
 
 def resnet101(pretrained=False, **kwargs):
@@ -139,5 +139,5 @@ def resnet101(pretrained=False, **kwargs):
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet101']))
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, 17)
+    model.fc = nn.Linear(num_ftrs, 16)
     return model

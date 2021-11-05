@@ -31,14 +31,14 @@ class Places17(Dummy):
     def __init__(self):
         super().__init__()
         start_time = time.time()
-        model_name = 'resnet101.pth.tar'
+        model_name = 'places-resnet50.pth.tar'
         classes_name = "classes.txt"
         model_path = os.path.join(self.path, model_name)
         classes_path = os.path.join(self.path, classes_name)
 
         self.topk = 5
         self.result = None
-        print(Logging.i("Start loading model({})".format(model_name)))
+        print(Logging.i("Start loading model({})".format(model_name.replace(".pth.tar", ""))))
 
         self.device = torch.device("cuda:0")
         self.classes = label_map(classes_path)
@@ -100,6 +100,8 @@ class Places17(Dummy):
                 result['result'].append(label)
             results["model_result"].append(result)
 
+        results["sequnce_result"] = self.merge_sequence(results["model_result"])
+
         end_time = time.time()
         results['analysis_time'] = end_time - start_time
         print(Logging.i("Processing time: {}".format(results['analysis_time'])))
@@ -107,3 +109,8 @@ class Places17(Dummy):
         self.result = results
 
         return self.result
+
+    def merge_sequence(self, frame_results):
+        sequence_results = []
+
+        return sequence_results

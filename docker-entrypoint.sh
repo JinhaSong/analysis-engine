@@ -2,7 +2,7 @@
 set -e
 
 cd /workspace
-wget ftp://mldisk.sogang.ac.kr/hidf/places/places17/resnet101-0808.pth.tar -O /workspace/Modules/places/resnet101.pth.tar
+wget ftp://mldisk.sogang.ac.kr/hidf/places/places16/9th-resnet50-20210826-19.pth.tar -O /workspace/Modules/places/places-resnet50.pth.tar
 sh run_migration.sh
 
 python3 -c "import os
