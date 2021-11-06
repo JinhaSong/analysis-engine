@@ -12,4 +12,5 @@ mysql-connector-python
 opencv-python
 sklearn
 konlpy
+tweepy==3.10.0
 python-youtube
