@@ -198,7 +198,7 @@ class SceneText:
 
         bboxes, crop_images, detect_box_img = self.detect_one_image(image, base_dir, 0)
         results = self.recognize_one_image(self.recognition_net, base_dir, bboxes=bboxes)
-        result["result"]  = results
+        result["frame_result"]  = results
         shutil.rmtree(base_dir)
         return result
 
@@ -210,7 +210,7 @@ class SceneText:
         results = {
             "model_name": "scene_text_recognition",
             "analysis_time": 0,
-            "model_result": []
+            "frame_results": []
         }
 
         start_time = time.time()
@@ -221,7 +221,9 @@ class SceneText:
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
             result["frame_number"] = int((idx + 1) * fps)
             result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
-            results["model_result"].append(result)
+            results["frame_results"].append(result)
+
+        results["sequence_results"] = self.merge_sequence(results["frame_results"])
 
         end_time = time.time()
         results['analysis_time'] = end_time - start_time
@@ -230,3 +232,26 @@ class SceneText:
         self.result = results
 
         return self.result
+    def merge_sequence(self, result):
+        sequence_results = []
+        # TODO
+        # - return format
+        # [
+        #     {
+        #         "label": {
+        #             "description": "class name",
+        #             "score": 100 # 추가여부는 선택사항
+        #         },
+        #         "position": { # 추가여부는 선택사항
+        #             "x": 100,
+        #             "y": 100,
+        #             "w": 100,
+        #             "h": 100
+        #         },
+        #         "start_frame": 30,
+        #         "end_frame": 300
+        #     }
+        #     ...
+        # ]
+
+        return sequence_results
