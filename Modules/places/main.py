@@ -101,7 +101,7 @@ class Places17(Dummy):
                 result['frame_result'].append(label)
             results["frame_results"].append(result)
 
-        results["sequence_result"] = self.merge_sequence(results["frame_results"])
+        results["sequence_results"] = self.merge_sequence(results["frame_results"])
 
         end_time = time.time()
         results['analysis_time'] = end_time - start_time
