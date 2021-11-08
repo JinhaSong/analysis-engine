@@ -103,7 +103,7 @@ class ObjectDetection(Dummy):
             }
         }
 
-        result = {"video_result": None}
+        result = {"frame_result": None}
         object_detection = []
         if out != None :
             for i in range(len(out[0]['rois'])) :
@@ -120,7 +120,7 @@ class ObjectDetection(Dummy):
 
                 deep_copy = copy.deepcopy(each_bbox)
                 object_detection.append(deep_copy)
-        result["result"] = object_detection
+        result["frame_result"] = object_detection
         self.result = result
         return self.result
 
@@ -132,7 +132,7 @@ class ObjectDetection(Dummy):
         results = {
             "model_name": "object_detection",
             "analysis_time": 0,
-            "model_result": []
+            "frame_results": []
         }
 
         start_time = time.time()
@@ -143,7 +143,9 @@ class ObjectDetection(Dummy):
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
             result["frame_number"] = int((idx + 1) * fps)
             result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
-            results["model_result"].append(result)
+            results["frame_results"].append(result)
+
+        results["sequence_results"] = self.merge_sequence(results["frame_results"])
 
         end_time = time.time()
         results['analysis_time'] = end_time - start_time
@@ -152,3 +154,27 @@ class ObjectDetection(Dummy):
         self.result = results
 
         return self.result
+
+    def merge_sequence(self, result):
+        sequence_results = []
+        # TODO
+        # - return format
+        # [
+        #     {
+        #         "label": {
+        #             "description": "class name",
+        #             "score": 100 # 추가여부는 선택사항
+        #         },
+        #         "position": { # 추가여부는 선택사항
+        #             "x": 100,
+        #             "y": 100,
+        #             "w": 100,
+        #             "h": 100
+        #         },
+        #         "start_frame": 30,
+        #         "end_frame": 300
+        #     }
+        #     ...
+        # ]
+
+        return sequence_results
