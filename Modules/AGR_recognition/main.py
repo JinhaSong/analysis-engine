@@ -115,7 +115,7 @@ class AGR_recognition(Dummy):
             }
         }
 
-        results = {"result": []}
+        results = {"frame_result": []}
         inference_image = copy.deepcopy(image)
 
         if out != None :
@@ -172,7 +172,7 @@ class AGR_recognition(Dummy):
                     if age_conf > 0.80 :
                         obj = obj+age_obj + " "
                         age_text = age_obj
-                        cv2.putText(inference_image," age: " + age_text , (int(x1),int(y2)), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(0,0,255), fontScale=1.5, thickness= 3)
+                        # cv2.putText(inference_image," age: " + age_text , (int(x1),int(y2)), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(0,0,255), fontScale=1.5, thickness= 3)
                     else :
                         obj = obj+"Unknown "
                         age_text = "Unknown "
@@ -180,7 +180,7 @@ class AGR_recognition(Dummy):
                     if gender_conf > 0.80 :
                         obj = obj+gender_obj + " "
                         gender_text = gender_obj
-                        cv2.putText(inference_image," gender: " + gender_text , (int(x1),int(y2)+40), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(0,255,0), fontScale=1.5, thickness= 3)
+                        # cv2.putText(inference_image," gender: " + gender_text , (int(x1),int(y2)+40), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(0,255,0), fontScale=1.5, thickness= 3)
                     else :
                         obj = obj+"Unknown "
                         gender_text = "Unknown "
@@ -188,7 +188,7 @@ class AGR_recognition(Dummy):
                     if race_conf > 0.80 :
                         obj = obj+race_obj + " "
                         race_text = race_obj
-                        cv2.putText(inference_image," race_obj: " + race_text , (int(x1),int(y2)+80), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255,0,0), fontScale=1.5, thickness= 3)
+                        # cv2.putText(inference_image," race_obj: " + race_text , (int(x1),int(y2)+80), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255,0,0), fontScale=1.5, thickness= 3)
                     else :
                         obj = obj+"Unknown "
                         race_text = "Unknown "
@@ -197,7 +197,7 @@ class AGR_recognition(Dummy):
                     classifier_score = classifier_score / 3
 
                     score = score * classifier_score
-                    inference_image = cv2.rectangle(inference_image,(int(x1),int(y1)),(int(x2),int(y2)),(0,0,255),thickness=3)
+                    # inference_image = cv2.rectangle(inference_image,(int(x1),int(y1)),(int(x2),int(y2)),(0,0,255),thickness=3)
 
                 each_bbox['label'][0]['description'] = obj
                 each_bbox['label'][0]['score'] = score
@@ -207,7 +207,7 @@ class AGR_recognition(Dummy):
                 each_bbox['position']['h'] = int(y2-y1)
 
                 deep_copy = copy.deepcopy(each_bbox)
-                results["result"].append(deep_copy)
+                results["frame_result"].append(deep_copy)
 
         return results
 
@@ -220,7 +220,7 @@ class AGR_recognition(Dummy):
         results = {
             "model_name": "age_gender_race_recognition",
             "analysis_time": 0,
-            "model_result": []
+            "frame_results": []
         }
 
         start_time = time.time()
@@ -231,7 +231,10 @@ class AGR_recognition(Dummy):
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
             result["frame_number"] = int((idx + 1) * fps)
             result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
-            results["model_result"].append(result)
+            results["frame_results"].append(result)
+
+        results["sequence_results"] = self.merge_sequence(results["frame_results"])
+
         end_time = time.time()
         results['analysis_time'] = end_time - start_time
         print(Logging.i("Processing time: {}".format(results['analysis_time'])))
@@ -239,3 +242,27 @@ class AGR_recognition(Dummy):
         self.result = results
 
         return self.result
+
+    def merge_sequence(self, result):
+        sequence_results = []
+        # TODO
+        # - return format
+        # [
+        #     {
+        #         "label": {
+        #             "description": "class name",
+        #             "score": 100 # 추가여부는 선택사항
+        #         },
+        #         "position": { # 추가여부는 선택사항
+        #             "x": 100,
+        #             "y": 100,
+        #             "w": 100,
+        #             "h": 100
+        #         },
+        #         "start_frame": 30,
+        #         "end_frame": 300
+        #     }
+        #     ...
+        # ]
+
+        return sequence_results
