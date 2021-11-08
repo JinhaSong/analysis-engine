@@ -23,6 +23,7 @@ from Modules.dummy.main import Dummy
 from WebAnalyzer.utils.media import frames_to_timecode
 from utils import Logging
 from Modules.places.metrictracker import label_map
+from Modules.places.contextGrouping import gaussianGrouping
 import time
 
 class Places17(Dummy):
@@ -33,17 +34,17 @@ class Places17(Dummy):
         start_time = time.time()
         model_name = 'places-resnet50.pth.tar'
         classes_name = "classes.txt"
-        model_path = os.path.join(self.path, model_name)
-        classes_path = os.path.join(self.path, classes_name)
+        self.model_path = os.path.join(self.path, model_name)
+        self.classes_path = os.path.join(self.path, classes_name)
 
         self.topk = 5
         self.result = None
         print(Logging.i("Start loading model({})".format(model_name.replace(".pth.tar", ""))))
 
         self.device = torch.device("cuda:0")
-        self.classes = label_map(classes_path)
-        state = torch.load(model_path, map_location='cuda:0')
-        self.model = wideresnet.resnet101()
+        self.classes = label_map(self.classes_path)
+        state = torch.load(self.model_path, map_location='cuda:0')
+        self.model = wideresnet.resnet50()
         self.model.load_state_dict(state['state_dict'], strict=False)
         self.model.to(self.device)
 
@@ -60,7 +61,7 @@ class Places17(Dummy):
         results = {
             "model_name": "places_recognition",
             "analysis_time": 0,
-            "model_result": []
+            "frame_results": []
         }
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
@@ -90,17 +91,17 @@ class Places17(Dummy):
             result = {
                 "frame_number": int((i + 1) * fps),
                 "frame_url": file_path,
-                "result": []
+                "frame_result": []
             }
             for j in range(0, self.topk):
                 label = {'label': {
                     'description': self.classes[idx[j]],
                     'score': float(probs[j]) * 100,
                 }}
-                result['result'].append(label)
-            results["model_result"].append(result)
+                result['frame_result'].append(label)
+            results["frame_results"].append(result)
 
-        results["sequnce_result"] = self.merge_sequence(results["model_result"])
+        results["sequence_result"] = self.merge_sequence(results["frame_results"])
 
         end_time = time.time()
         results['analysis_time'] = end_time - start_time
@@ -110,7 +111,8 @@ class Places17(Dummy):
 
         return self.result
 
-    def merge_sequence(self, frame_results):
-        sequence_results = []
-
+    def merge_sequence(self, result):
+        f = gaussianGrouping(frame_results=result, label_map_path=self.classes_path)
+        sequence_results = f.smoothing()
+        print(sequence_results)
         return sequence_results
