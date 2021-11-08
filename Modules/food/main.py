@@ -118,7 +118,7 @@ class Food(Dummy):
         # filtering food related bbox
         food_boxes = [box for box in boxes[0] if box[-1] in self.coco_food_related_idx]
 
-        result = {"result": []}
+        result = {"frame_result": []}
         if len(food_boxes):
             # crop bbox
             crop_imgs = [img.crop((int(box[0] * w), int(box[1] * h), int(box[2] * w), int(box[3] * h))) for box
