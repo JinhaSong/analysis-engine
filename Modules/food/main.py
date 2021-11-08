@@ -135,12 +135,12 @@ class Food(Dummy):
                 prob, indice = torch.topk(outputs.cpu(), k=1)
                 food_prob.extend(list(prob.numpy().flatten()))
                 food_indice.extend(list(indice.numpy().flatten()))
-            result["result"] = [
+            result["frame_result"] = [
                 {
-                    'label': {
+                    'label': [{
                         "description": self.food_classes[food_indice[i]],
                         "score": food_prob[i] * 100,
-                    },
+                    }],
                          "position": {"h": int(box[3] * h),
                                       "w": int(box[2] * w),
                                       "x": max(int(box[0] * w), 0),
@@ -157,7 +157,7 @@ class Food(Dummy):
         results = {
             "model_name": "food_detection",
             "analysis_time": 0,
-            "model_result": []
+            "frame_results": []
         }
 
         start_time = time.time()
@@ -168,7 +168,9 @@ class Food(Dummy):
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
             result["frame_number"] = int((idx + 1) * fps)
             result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
-            results["model_result"].append(result)
+            results["frame_results"].append(result)
+
+        results["sequence_results"] = self.merge_sequence(results["frame_results"])
 
         end_time = time.time()
         results['analysis_time'] = end_time - start_time
@@ -177,3 +179,27 @@ class Food(Dummy):
         self.result = results
 
         return self.result
+
+    def merge_sequence(self, result):
+        sequence_results = []
+        # TODO
+        # - return format
+        # [
+        #     {
+        #         "label": {
+        #             "description": "class name",
+        #             "score": 100 # 추가여부는 선택사항
+        #         },
+        #         "position": { # 추가여부는 선택사항
+        #             "x": 100,
+        #             "y": 100,
+        #             "w": 100,
+        #             "h": 100
+        #         },
+        #         "start_frame": 30,
+        #         "end_frame": 300
+        #     }
+        #     ...
+        # ]
+
+        return sequence_results
