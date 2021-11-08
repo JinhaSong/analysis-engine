@@ -73,8 +73,8 @@ class ImageCaptioning:
         tmp_image = coco.val_transform(image).unsqueeze(0)
         result, flag = self.inference(tmp_image)
 
-        frame_result = {"result": []}
-        frame_result["result"].append({
+        frame_result = {"frame_result": []}
+        frame_result["frame_result"].append({
             "label": [
                 {
                     "description": result,
@@ -94,7 +94,7 @@ class ImageCaptioning:
         results = {
             "model_name": "image_captioning",
             "analysis_time": 0,
-            "model_result": []
+            "frame_results": []
         }
 
         start_time = time.time()
@@ -107,7 +107,9 @@ class ImageCaptioning:
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
             result["frame_number"] = int((idx + 1) * fps)
             result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
-            results["model_result"].append(result)
+            results["frame_results"].append(result)
+
+        results["sequence_results"] = self.merge_sequence(results["frame_results"])
 
         end_time = time.time()
         results['analysis_time'] = end_time - start_time
@@ -116,3 +118,27 @@ class ImageCaptioning:
         self.result = results
 
         return self.result
+
+    def merge_sequence(self, result):
+        sequence_results = []
+        # TODO
+        # - return format
+        # [
+        #     {
+        #         "label": {
+        #             "description": "class name",
+        #             "score": 100 # 추가여부는 선택사항
+        #         },
+        #         "position": { # 추가여부는 선택사항
+        #             "x": 100,
+        #             "y": 100,
+        #             "w": 100,
+        #             "h": 100
+        #         },
+        #         "start_frame": 30,
+        #         "end_frame": 300
+        #     }
+        #     ...
+        # ]
+
+        return sequence_results
