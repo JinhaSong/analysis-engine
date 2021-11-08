@@ -1,3 +1,7 @@
+import ast
+import json
+
+import requests
 from torchvision.transforms import transforms as trn
 from torchvision.datasets.folder import default_loader
 
@@ -65,6 +69,10 @@ class Food(Dummy):
         food_classes_txt_path = os.path.join(self.path, 'classes.txt')
 
         self.coco_food_related_idx = [45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 60]
+        self.coco_food_related_class = [
+            "wine glass", "cup", "fork", "knife", "spoon", "bowl",
+            "banana", "apple", "sandwich", "orange", "broccoli", "cake"
+        ]
         self.food_classes = [i.strip() for i in open(food_classes_txt_path, 'r', encoding="utf-8").readlines()]
 
         self.detector = self.load_detector(yolo_cfg_path, yolo_weight_path)
@@ -116,9 +124,10 @@ class Food(Dummy):
         boxes = post_processing(image, conf_thr, nms_thr, outputs)
 
         # filtering food related bbox
+        print(boxes)
         food_boxes = [box for box in boxes[0] if box[-1] in self.coco_food_related_idx]
 
-        result = {"frame_result": []}
+        result = {"frame_result": None}
         if len(food_boxes):
             # crop bbox
             crop_imgs = [img.crop((int(box[0] * w), int(box[1] * h), int(box[2] * w), int(box[3] * h))) for box
@@ -149,8 +158,58 @@ class Food(Dummy):
             ]
         return result
 
+    @torch.no_grad()
+    def inference_by_image_no_detection(self, image_path, object_info):
+        cls_thr = .0
+        img = default_loader(image_path)
+        w, h = img.size[0], img.size[1]
+
+        food_boxes = []
+        for obj in object_info["frame_result"]:
+            label = obj["label"][0]["description"]
+            if label in self.coco_food_related_class :
+                position = obj["position"]
+                x1 = (position['x'])
+                y1 = (position['y'])
+                x2 = (x1 + position['w'])
+                y2 = (y1 + position['h'])
+                food_boxes.append((x1, y1, x2, y2))
+
+        result = {"frame_result": None}
+        if len(food_boxes):
+            crop_imgs = [img.crop((int(box[0]), int(box[1]), int(box[2]), int(box[3]))) for box
+                         in food_boxes]
+            food_loader = DataLoader(ListDataset(crop_imgs, transform=self.classifer_transform, load=False),
+                                     batch_size=1,
+                                     shuffle=False,
+                                     num_workers=0)
+
+            food_prob, food_indice = [], []
+            for i, im in enumerate(food_loader):
+                outputs = self.classifier(im.cuda())
+                outputs = self.prob(outputs)
+                prob, indice = torch.topk(outputs.cpu(), k=1)
+                food_prob.extend(list(prob.numpy().flatten()))
+                food_indice.extend(list(indice.numpy().flatten()))
+            result["frame_result"] = [
+                {
+                    'label': [{
+                        "description": self.food_classes[food_indice[i]],
+                        "score": food_prob[i] * 100,
+                    }],
+                         "position": {"h": int(box[3]),
+                                      "w": int(box[2]),
+                                      "x": max(int(box[0]), 0),
+                                      "y": max(int(box[1]), 0)}
+                } for i, box in enumerate(food_boxes) if food_prob[i] > cls_thr
+            ]
+        else:
+            result["frame_result"] = []
+        return result
+
     def inference_by_video(self, frame_path_list, infos):
         video_info = infos['video_info']
+        object_info_text = infos['video_text']
         frame_urls = infos['frame_urls']
         fps = video_info['extract_fps']
         print(Logging.i("Start inference by video"))
@@ -160,21 +219,38 @@ class Food(Dummy):
             "frame_results": []
         }
 
+        try:
+            object_infos = json.loads(str(object_info_text))["frame_results"]
+        except:
+            object_infos = None
+
         start_time = time.time()
-        for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
-            if idx % 10 == 0:
-                print(Logging.i("Processing... (index: {}/{} / frame number: {} / path: {})".format(idx, len(frame_path_list), int((idx + 1) * fps), frame_path)))
-            result = self.inference_by_image(frame_path)
-            result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
-            result["frame_number"] = int((idx + 1) * fps)
-            result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
-            results["frame_results"].append(result)
+        if object_infos is None:
+            for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
+                if idx % 10 == 0:
+                    print(Logging.i("Processing... (index: {}/{} / frame number: {} / path: {})".format(idx, len(frame_path_list), int((idx + 1) * fps), frame_path)))
+                result = self.inference_by_image(frame_path)
+                result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
+                result["frame_number"] = int((idx + 1) * fps)
+                result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
+                results["frame_results"].append(result)
 
-        results["sequence_results"] = self.merge_sequence(results["frame_results"])
+            results["sequence_results"] = self.merge_sequence(results["frame_results"])
+        else :
+            for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
+                if idx % 10 == 0:
+                    print(Logging.i("Processing... (index: {}/{} / frame number: {} / path: {})".format(idx, len(frame_path_list),int((idx + 1) * fps), frame_path)))
+                result = self.inference_by_image_no_detection(frame_path, object_infos[idx])
+                result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
+                result["frame_number"] = int((idx + 1) * fps)
+                result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
+                results["frame_results"].append(result)
 
-        end_time = time.time()
-        results['analysis_time'] = end_time - start_time
-        print(Logging.i("Processing time: {}".format(results['analysis_time'])))
+            results["sequence_results"] = self.merge_sequence(results["frame_results"])
+
+            end_time = time.time()
+            results['analysis_time'] = end_time - start_time
+            print(Logging.i("Processing time: {}".format(results['analysis_time'])))
 
         self.result = results
 
