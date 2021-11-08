@@ -114,5 +114,4 @@ class Places17(Dummy):
     def merge_sequence(self, result):
         f = gaussianGrouping(frame_results=result, label_map_path=self.classes_path)
         sequence_results = f.smoothing()
-        print(sequence_results)
         return sequence_results
