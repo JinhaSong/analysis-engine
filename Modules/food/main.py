@@ -124,7 +124,6 @@ class Food(Dummy):
         boxes = post_processing(image, conf_thr, nms_thr, outputs)
 
         # filtering food related bbox
-        print(boxes)
         food_boxes = [box for box in boxes[0] if box[-1] in self.coco_food_related_idx]
 
         result = {"frame_result": None}
@@ -228,7 +227,7 @@ class Food(Dummy):
         if object_infos is None:
             for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
                 if idx % 10 == 0:
-                    print(Logging.i("Processing... (index: {}/{} / frame number: {} / path: {})".format(idx, len(frame_path_list), int((idx + 1) * fps), frame_path)))
+                    print(Logging.i("Processing(with detection)... (index: {}/{} / frame number: {} / path: {})".format(idx, len(frame_path_list), int((idx + 1) * fps), frame_path)))
                 result = self.inference_by_image(frame_path)
                 result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
                 result["frame_number"] = int((idx + 1) * fps)
@@ -239,7 +238,7 @@ class Food(Dummy):
         else :
             for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
                 if idx % 10 == 0:
-                    print(Logging.i("Processing... (index: {}/{} / frame number: {} / path: {})".format(idx, len(frame_path_list),int((idx + 1) * fps), frame_path)))
+                    print(Logging.i("Processing(no detection)... (index: {}/{} / frame number: {} / path: {})".format(idx, len(frame_path_list),int((idx + 1) * fps), frame_path)))
                 result = self.inference_by_image_no_detection(frame_path, object_infos[idx])
                 result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
                 result["frame_number"] = int((idx + 1) * fps)
