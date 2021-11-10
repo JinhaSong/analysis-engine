@@ -72,66 +72,67 @@ class TextRank:
         test_flag = 1
         keyword_test_list = []
 
-        keyword_test = {}
-        for i in range(len(data)):
-            data[i] = self.clean_special_characters(self.clean_without_hangul(data[i]))
+        if data[0] != None :
+            keyword_test = {}
+            for i in range(len(data)):
+                data[i] = self.clean_special_characters(self.clean_without_hangul(data[i]))
 
-        key_test = ""
-        try:
-            key_test = self.keyword_extractor.summarize(data, topk=10)
-        except:
-            pass
+            key_test = ""
+            try:
+                key_test = self.keyword_extractor.summarize(data, topk=10)
+            except:
+                pass
 
-        keyword_test['keyword'] = key_test
-        keyword_test_list.append(keyword_test)
+            keyword_test['keyword'] = key_test
+            keyword_test_list.append(keyword_test)
 
-        f1 = 0
-        total = 1
+            f1 = 0
+            total = 1
 
-        for t_k in keyword_test_list:
-            compare_list = []
-            score_list = []
-            list_count = 0
-            dic_flag = 0
-            text_json_result = {"label": []}
+            for t_k in keyword_test_list:
+                compare_list = []
+                score_list = []
+                list_count = 0
+                dic_flag = 0
+                text_json_result = {"label": []}
 
-            for word, rank in t_k['keyword']:
-                word = word.split('/')
-                word = word[0]
-                if list_count < 5:
-                    compare_list.append(word)
-                    score_list.append(rank)
-                    list_count += 1
-                if word in self.userdic:
-                    compare_list.pop()
-                    compare_list.insert(0, word)
-                    score_list.pop()
-                    score_list.insert(0, rank)
-                    dic_flag = 1
-                if dic_flag == 0:
-                    for ud in self.userdic:
-                        if word in ud:
-                            compare_list.pop()
-                            compare_list.append(word)
-                            score_list.pop()
-                            score_list.append(rank)
+                for word, rank in t_k['keyword']:
+                    word = word.split('/')
+                    word = word[0]
+                    if list_count < 5:
+                        compare_list.append(word)
+                        score_list.append(rank)
+                        list_count += 1
+                    if word in self.userdic:
+                        compare_list.pop()
+                        compare_list.insert(0, word)
+                        score_list.pop()
+                        score_list.insert(0, rank)
+                        dic_flag = 1
+                    if dic_flag == 0:
+                        for ud in self.userdic:
+                            if word in ud:
+                                compare_list.pop()
+                                compare_list.append(word)
+                                score_list.pop()
+                                score_list.append(rank)
 
-            for comp_i in range(len(compare_list)):
-                json_result_element = {"description": str(compare_list[comp_i]), "score": score_list[comp_i]}
-                text_json_result["label"].append(json_result_element)
-            results["model_result"].append(text_json_result)
+                for comp_i in range(len(compare_list)):
+                    json_result_element = {"description": str(compare_list[comp_i]), "score": score_list[comp_i]}
+                    text_json_result["label"].append(json_result_element)
+                results["model_result"].append(text_json_result)
 
-            total += 1
-            if test_flag == 0 or test_flag == 2:
-                answer_words = t_k['answer'].replace(" ", "")
-                answer_words = answer_words.split(";")
-                for word in compare_list:
-                    if word in answer_words:
-                        f1 += 1
-                        break
-        end_time = time.time()
-        results['analysis_time'] = end_time - start_time
-        print(Logging.i("Processing time: {}".format(results['analysis_time'])))
+                total += 1
+                if test_flag == 0 or test_flag == 2:
+                    answer_words = t_k['answer'].replace(" ", "")
+                    answer_words = answer_words.split(";")
+                    for word in compare_list:
+                        if word in answer_words:
+                            f1 += 1
+                            break
+            end_time = time.time()
+            results['analysis_time'] = end_time - start_time
+            print(Logging.i("Processing time: {}".format(results['analysis_time'])))
 
         self.result = results
 
