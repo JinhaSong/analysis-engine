@@ -29,7 +29,10 @@ class gaussianGrouping:
         self.label_map_path = label_map_path
         self.video_fps = video_fps
         self.window_size = window_size
-        self.sigma = 1.5
+        if window_size < 4:
+            self.sigma = 1.5
+        else:
+            self.sigma = 2
 
     def makeGaussian(self):
         n = self.window_size * 2 + 1
@@ -42,14 +45,14 @@ class gaussianGrouping:
         # entering the real scores {aquarium:0.5, aquarium:0.2 ```}
         label_score = labelScore(label_map_path=self.label_map_path)
         frame_scores = []
-        for i in range(len(self.frame_results)):
-            for result in self.frame_results[0]['frame_result']:
-                frame_score = label_score
-                top = result["label"]["description"]
-                score = round(result["label"]["score"], 2)
-                frame_score[top] = score
-                frame_scores.append(frame_score)
 
+        for result in self.frame_results:
+            frame_score = label_score.copy()
+            for j in range(0, 5):
+                top = result["frame_result"][j]["label"]["description"]
+                score = round(result["frame_result"][j]["label"]["score"], 2)
+                frame_score[top] = score
+            frame_scores.append(frame_score)
         return frame_scores
 
     def placesContext(self):
