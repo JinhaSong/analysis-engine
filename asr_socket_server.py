@@ -134,7 +134,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     'audio_url': audio_url,
                     'start_time': start_time,
                     'end_time': end_time,
-                    'result': result
+                    'audio_result': result
                 }
                 results.append(segment_result)
             processing_end = time.time()

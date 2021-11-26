@@ -20,24 +20,20 @@ class AutomaticSpeechRecognition:
     def inference_by_audio(self, data, infos):
         paths = data['paths']
         sub_dirs = data['sub_dirs']
-        file_list = data['file_lists']
-
-        result = []
 
         # ASR(Automatic Speech Recognition)
-        asr_result = self.inference_asr(paths[2], sub_dirs[2] + "/")
-        result.append(asr_result)
+        asr_result = self.inference_asr(paths[2])
 
-        self.result = result
+        self.result = asr_result
 
         return self.result
 
-    def inference_asr(self, path, sub_dir):
+    def inference_asr(self, path):
         model_name = 'automatic_speech_recognition'
         asr_results = {
             'model_name': model_name,
             'analysis_time': 0,
-            'model_result': None
+            'audio_results': None
         }
         print(Logging.i("Start preprocessing"))
 
@@ -66,11 +62,11 @@ class AutomaticSpeechRecognition:
                         rdata = s.recv(1024)
                 except Exception as ex:
                     print(ex)
-            asr_results['model_result'] = ast.literal_eval(result)
+            asr_results['audio_results'] = ast.literal_eval(result)
             s.close()
 
         except :
-            asr_results['model_result'] = []
+            asr_results['audio_results'] = []
         end_time = time.time()
         asr_results['analysis_time'] = end_time - start_time
         print(Logging.i("Processing time: {}".format(asr_results['analysis_time'])))
