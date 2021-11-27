@@ -22,18 +22,18 @@ class AutomaticSpeechRecognition:
         sub_dirs = data['sub_dirs']
 
         # ASR(Automatic Speech Recognition)
-        asr_result = self.inference_asr(paths[2])
-
+        asr_result = self.inference_asr(paths[2], sub_dirs[1] + "/")
+        asr_result["sequence_results"] = self.merge_sequence(asr_result["audio_results"])
         self.result = asr_result
 
         return self.result
 
-    def inference_asr(self, path):
+    def inference_asr(self, path, sub_dir):
         model_name = 'automatic_speech_recognition'
         asr_results = {
             'model_name': model_name,
             'analysis_time': 0,
-            'audio_results': None
+            'audio_results': []
         }
         print(Logging.i("Start preprocessing"))
 
@@ -73,3 +73,27 @@ class AutomaticSpeechRecognition:
 
         return asr_results
 
+
+    def merge_sequence(self, result):
+        sequence_results = []
+        # TODO
+        # - return format
+        # [
+        #     {
+        #         "label": {
+        #             "description": "class name",
+        #             "score": 100 # 추가여부는 선택사항
+        #         },
+        #         "position": { # 추가여부는 선택사항
+        #             "x": 100,
+        #             "y": 100,
+        #             "w": 100,
+        #             "h": 100
+        #         },
+        #         "start_time": "00:00:00.00",
+        #         "end_time": "00:00:30.00"
+        #     }
+        #     ...
+        # ]
+
+        return sequence_results
