@@ -28,7 +28,7 @@ class AudioEventDetection:
         sub_dirs = data['sub_dirs']
 
         aed_result = self.inference_aed(paths[0], sub_dirs[0] + "/")
-
+        aed_result["sequence_results"] = self.merge_sequence(aed_result["audio_results"])
         self.result = aed_result
 
         return self.result
@@ -58,3 +58,27 @@ class AudioEventDetection:
         print(Logging.i("Processing time: {}".format(aed_results['analysis_time'])))
 
         return aed_results
+
+    def merge_sequence(self, result):
+        sequence_results = []
+        # TODO
+        # - return format
+        # [
+        #     {
+        #         "label": {
+        #             "description": "class name",
+        #             "score": 100 # 추가여부는 선택사항
+        #         },
+        #         "position": { # 추가여부는 선택사항
+        #             "x": 100,
+        #             "y": 100,
+        #             "w": 100,
+        #             "h": 100
+        #         },
+        #         "start_time": "00:00:00.00",
+        #         "end_time": "00:00:30.00"
+        #     }
+        #     ...
+        # ]
+
+        return sequence_results
