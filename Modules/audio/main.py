@@ -26,14 +26,10 @@ class AudioEventDetection:
     def inference_by_audio(self, data, infos):
         paths = data['paths']
         sub_dirs = data['sub_dirs']
-        file_list = data['file_lists']
-
-        result = []
 
         aed_result = self.inference_aed(paths[0], sub_dirs[0] + "/")
-        result.append(aed_result)
 
-        self.result = result
+        self.result = aed_result
 
         return self.result
 
@@ -44,7 +40,7 @@ class AudioEventDetection:
         aed_results = {
             'model_name': model_name,
             'analysis_time': 0,
-            'model_result': []
+            'audio_results': []
         }
         start_time = time.time()
         for i, file in enumerate(files):
@@ -55,7 +51,7 @@ class AudioEventDetection:
             i = int(file.split('/')[-1].replace('.wav', ''))
             threshold = 0.5
             result = aed_process(i, threshold, logmel_data, self.aed_model, wavpath)
-            aed_results['model_result'].append(result)
+            aed_results['audio_results'].append(result)
             os.remove(wavpath)
         end_time = time.time()
         aed_results['analysis_time'] = end_time - start_time
