@@ -1,7 +1,10 @@
+import json
 import time
 import os
 import pickle
 import re
+
+import ast
 from konlpy.tag import Komoran
 from Modules.textrank.utils.summarizer import KeywordSummarizer
 from utils import Logging
@@ -60,12 +63,50 @@ class TextRank:
         hangul = re.compile('[^1234567890 \u3131-\u3163\uac00-\ud7a3]+')
         return hangul.sub('', text)
 
+    def get_strings(self, base_model_result, base_model_name, key):
+        strings = []
+
+        if base_model_name == "scene_text_recognition":
+            for result in base_model_result:
+                single_results = result[key + "_result"]
+                for single_result in single_results:
+                    str_label = single_result["label"][0]["description"]
+                    if len(str_label) > 0:
+                        strings.append(str_label)
+        elif base_model_name == "automatic_speech_recognition":
+            for audio_result in base_model_result:
+                str_label = audio_result[key + "_result"]
+                if len(str_label) > 0:
+                    strings.append(str_label)
+
+        return strings
+
+
     def inference_by_text(self, data, video_info):
+        try :
+            base_model_result = ast.literal_eval(data[0])
+            print(base_model_result.keys())
+            base_model_name = base_model_result["model_name"]
+
+            if base_model_name == "scene_text_recognition":
+                key = "frame"
+            elif base_model_name == "automatic_speech_recognition" or base_model_name == "audio_scene_classification":
+                key = "audio"
+            else :
+                key = "frame"
+
+            str_data = self.get_strings(base_model_result[key + "_results"], base_model_name, key)
+            data = str_data.copy()
+        except :
+            base_model_name = None
+            str_data = data.copy()
+
         results = {
-            "text": data,
+            "text": str_data,
             "model_name": "text_rank",
+            "base_model_name": base_model_name,
             "analysis_time": 0,
-            "model_result": []
+            "text_result": []
         }
 
         start_time = time.time()
@@ -120,7 +161,7 @@ class TextRank:
                 for comp_i in range(len(compare_list)):
                     json_result_element = {"description": str(compare_list[comp_i]), "score": score_list[comp_i]}
                     text_json_result["label"].append(json_result_element)
-                results["model_result"].append(text_json_result)
+                results["text_result"].append(text_json_result)
 
                 total += 1
                 if test_flag == 0 or test_flag == 2:
