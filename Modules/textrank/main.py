@@ -85,7 +85,6 @@ class TextRank:
     def inference_by_text(self, data, video_info):
         try :
             base_model_result = ast.literal_eval(data[0])
-            print(base_model_result.keys())
             base_model_name = base_model_result["model_name"]
 
             if base_model_name == "scene_text_recognition":
