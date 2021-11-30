@@ -58,7 +58,7 @@ class ObjectDetection(Dummy):
         model = EfficientDetBackbone(compound_coef=self.compound_coef, num_classes=len(self.obj_list),
                                      ratios=self.anchor_ratios, scales=self.anchor_scales)
 
-        model.load_state_dict(torch.load(os.path.join(self.path, 'model', 'efficientdet-d6.pth')))
+        model.load_state_dict(torch.load(os.path.join(self.path, 'model', 'efficientdet-d4.pth')))
         model.requires_grad_(False)
         model.eval()
         model = model.cuda()
