@@ -1,8 +1,9 @@
-FROM nvidia/cuda:10.2-cudnn8-devel-ubuntu18.04
+FROM nvidia/cuda:11.0-cudnn8-devel-ubuntu18.04
 
 RUN apt-get update \
     && apt-get -y install python3 python3-pip python3-dev \
-    mysql-client libmysqlclient-dev python3-mysqldb \
+    mysql-client libmysqlclient-dev python3-mysqldb python3-tk \
+    libsm6 \
     git wget ssh vim \
     apt-utils libgl1 ffmpeg \
     && rm -rf /var/lib/apt/lists/*
