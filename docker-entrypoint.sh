@@ -2,10 +2,10 @@
 set -e
 
 cd /workspace
-mkdir /workspace/Modules/interaction/weight
-wget ftp://mldisk.sogang.ac.kr/hidf/human_object_interaction/new_prior_mask.pkl -O /workspace/Modules/interaction/weight/new_prior_mask.pkl
-wget ftp://mldisk.sogang.ac.kr/hidf/human_object_interaction/vcoco.yml -O /workspace/Modules/interaction/weight/vcoco.yml
-wget ftp://mldisk.sogang.ac.kr/hidf/human_object_interaction/vcoco_best.pth -O /workspace/Modules/interaction/weight/vcoco_best.pth
+mkdir /workspace/Modules/interaction/weights
+wget ftp://mldisk.sogang.ac.kr/hidf/human_object_interaction/new_prior_mask.pkl -O /workspace/Modules/interaction/weights/new_prior_mask.pkl
+wget ftp://mldisk.sogang.ac.kr/hidf/human_object_interaction/vcoco.yml -O /workspace/Modules/interaction/weights/vcoco.yml
+wget ftp://mldisk.sogang.ac.kr/hidf/human_object_interaction/vcoco_best.pth -O /workspace/Modules/interaction/weights/vcoco_best.pth
 
 sh run_migration.sh
 python3 -c "import os
