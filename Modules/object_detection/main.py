@@ -42,7 +42,7 @@ class ObjectDetection(Dummy):
     def __init__(self):
         super().__init__()
         start_time = time.time()
-        self.compound_coef = 6
+        self.compound_coef = 4
         self.force_input_size = None  # set None to use default size
 
         # replace this part with your project's anchor config
