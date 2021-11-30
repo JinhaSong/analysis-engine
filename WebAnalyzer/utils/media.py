@@ -82,7 +82,7 @@ def extract_frames(video_url, extract_fps):
     frame_url_list = []
     frame_path_list = []
     for frame_num in range(1, framecount + 1):
-        path = settings.MEDIA_ROOT + os.path.join(url, "{0:05d}.{1}".format(frame_num,"jpg"))
+        path = settings.MEDIA_ROOT + "/" + os.path.join(url, "{0:05d}.{1}".format(frame_num,"jpg"))
         frame_url_list.append(os.path.join(url, str(frame_num) + ".jpg"))
         frame_path_list.append(path)
 
