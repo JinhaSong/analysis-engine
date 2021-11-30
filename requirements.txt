@@ -9,10 +9,8 @@ mysqlclient==2.0.1
 mysql-connector
 mysql-connector-python
 opencv-python
-pycocotools
 numpy
 opencv-python
 pyyaml
-webcolors
 torch==1.5.1
 torchvision==0.6.1
