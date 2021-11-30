@@ -2,6 +2,10 @@
 set -e
 
 cd /workspace
+wget ftp://mldisk.sogang.ac.kr/hidf/human_object_interaction/new_prior_mask.pkl -O /workspace/Modules/interaction/weight/new_prior_mask.pkl
+wget ftp://mldisk.sogang.ac.kr/hidf/human_object_interaction/vcoco.yml -O /workspace/Modules/interaction/weight/vcoco.yml
+wget ftp://mldisk.sogang.ac.kr/hidf/human_object_interaction/vcoco_best.pth -O /workspace/Modules/interaction/weight/vcoco_best.pth
+
 sh run_migration.sh
 python3 -c "import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'AnalysisEngine.settings'
