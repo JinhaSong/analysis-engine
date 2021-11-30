@@ -24,7 +24,7 @@ services:
     volumes:
       - ./media:/workspace/media
     ports:
-      - "11200:8000"
+      - "11002:8000"
       - "11222:22"
     stdin_open: true
     tty: true
