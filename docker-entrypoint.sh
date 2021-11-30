@@ -2,6 +2,7 @@
 set -e
 
 cd /workspace
+mkdir /workspace/Modules/object_detection/model
 wget ftp://mldisk.sogang.ac.kr/hidf/object_detection/efficientdet-d4.pth -O /workspace/Modules/object_detection/model/efficientdet-d4.pth
 sh run_migration.sh
 python3 -c "import os
