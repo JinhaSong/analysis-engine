@@ -409,7 +409,7 @@ class HOI(Dummy):
         fps = video_info['extract_fps']
         print(Logging.i("Start inference by video"))
         results = {
-            "model_name": "object_detection",
+            "model_name": "human_object_interaction",
             "analysis_time": 0,
             "frame_results": []
         }
