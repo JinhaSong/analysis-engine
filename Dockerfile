@@ -1,7 +1,7 @@
 FROM nvidia/cuda:11.0-cudnn8-devel-ubuntu18.04
 
-RUN apt-get update \
-    && apt-get -y install python3 python3-pip python3-dev \
+RUN apt-get update
+RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install python3 python3-pip python3-dev \
     mysql-client libmysqlclient-dev python3-mysqldb python3-tk \
     libsm6 \
     git wget ssh vim \
@@ -27,7 +27,7 @@ ENV DJANGO_SUPERUSER_PASSWORD password
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"]
+#ENTRYPOINT ["/docker-entrypoint.sh"]
 
 RUN chmod -R a+w /workspace
 
