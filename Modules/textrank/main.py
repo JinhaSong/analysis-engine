@@ -128,6 +128,7 @@ class TextRank:
 
             f1 = 0
             total = 1
+            location_list = ['성수', '이태원', '을지로', '남산', '잠실', '강남', '신촌', '명동', '여의도', '영등포', '동대문', '홍대', '신도림', '종로']
 
             for t_k in keyword_test_list:
                 compare_list = []
@@ -139,11 +140,11 @@ class TextRank:
                 for word, rank in t_k['keyword']:
                     word = word.split('/')
                     word = word[0]
-                    if list_count < 5:
+                    if list_count < 10:
                         compare_list.append(word)
                         score_list.append(rank)
                         list_count += 1
-                    if word in self.userdic:
+                    if word in self.userdic or word in self.tourAPI:
                         compare_list.pop()
                         compare_list.insert(0, word)
                         score_list.pop()
@@ -153,9 +154,72 @@ class TextRank:
                         for ud in self.userdic:
                             if word in ud:
                                 compare_list.pop()
-                                compare_list.append(word)
+                                compare_list.insert(0,word)
                                 score_list.pop()
-                                score_list.append(rank)
+                                score_list.insert(0,rank)
+                    ###
+                ##LOC Priority
+                LOCATION_PR = 1
+            for c_i, com in enumerate(compare_list):
+                ### sub location
+                change_flag = 0
+                if com in ['뚝섬역', '뚝섬', '광나루', '성수동']:
+                    change_flag = 1
+                    com1 = '성수'
+                elif com in ['이태원']:
+                    change_flag = 1
+                    com1 = '이태원'
+                elif com in ['을지로6가']:
+                    change_flag = 1
+                    com1 = '을지로'
+                elif com in ['남산']:
+                    change_flag = 1
+                    com1 = '남산'
+                elif com in ['문정동', '문정점', '방이', '방이동', '석촌']:
+                    change_flag = 1
+                    com1 = '잠실'
+                elif com in ['탄천', '코엑스', '논현동', '신사', 'C27 가로수길', 'C27', '강남코엑스', '강남역', '역삼', '양재천']:
+                    change_flag = 1
+                    com1 = '강남'
+                elif com in ['이대', '이대점']:
+                    change_flag = 1
+                    com1 = '신촌'
+                elif com in ['명동']:
+                    change_flag = 1
+                    com1 = '명동'
+                elif com in ['여의도']:
+                    change_flag = 1
+                    com1 = '여의도'
+                elif com in ['영등포 신길동 홍어거리', '신길동', '대림동']:
+                    change_flag = 1
+                    com1 = '영등포'
+                elif com in ['동대문 문구완구거리']:
+                    change_flag = 1
+                    com1 = '동대문'
+                elif com in ['홍대역', '연남동', '연남', '합정역', '망원역']:
+                    change_flag = 1
+                    com1 = '홍대'
+                elif com in ['신도림']:
+                    change_flag = 1
+                    com1 = '신도림'
+                elif com in ['낙원동', '낙원동 아구찜 거리', '종각역', '서촌', '인사동', '대학로', '익선동', '토속촌', '종로3가', '북촌', '청계천', '혜화동', '혜화', '세종대로', '이화동']:
+                    change_flag = 1
+                    com1 = '종로'
+                ###sub loc
+                if LOCATION_PR == 1:
+                    if com in location_list or change_flag == 1:
+                        compare_list.remove(compare_list[c_i])
+                        compare_list.insert(0,com)
+                        tmp = score_list[c_i]
+                        score_list.remove(tmp)
+                        score_list.insert(0,tmp)
+                        if change_flag == 1:
+                            compare_list.pop()
+                            compare_list.insert(0,com1)
+                            score_list.pop()
+                            score_list.insert(0,score_list[c_i])
+                        break
+
 
                 for comp_i in range(len(compare_list)):
                     json_result_element = {"description": str(compare_list[comp_i]), "score": score_list[comp_i]}
