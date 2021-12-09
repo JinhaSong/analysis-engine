@@ -158,8 +158,8 @@ class TextRank:
                                 score_list.pop()
                                 score_list.insert(0,rank)
                     ###
-                ##LOC Priority
-                LOCATION_PR = 1
+            ##LOC Priority
+            LOCATION_PR = 1
             for c_i, com in enumerate(compare_list):
                 ### sub location
                 change_flag = 0
