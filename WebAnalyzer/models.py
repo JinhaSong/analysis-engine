@@ -44,6 +44,8 @@ class VideoModel(models.Model):
     token = models.AutoField(primary_key=True)
     uploaded_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
+    start_time = models.TextField(max_length=15, default='00:00:00.00')
+    end_time = models.TextField(max_length=15, default='00:00:00.00')
     result = JSONField(null=True)
 
     def save(self, *args, **kwargs):
