@@ -72,10 +72,15 @@ def extract_audio(video_url):
     return url
 
 
-def extract_frames(video_url, extract_fps):
+def extract_frames(video_url, extract_fps, start_time, end_time):
     frame_dir_path, url = get_video_dir_path(video_url)
 
-    command = "ffmpeg -y -hide_banner -loglevel panic -i {} -vsync 2 -q:v 0 -vf fps={} {}/%05d.jpg".format(video_url, extract_fps, frame_dir_path)
+    command = "ffmpeg -y -hide_banner -loglevel panic -i {} -ss {} -to {} -vsync 2 -q:v 0 -vf fps={} {}/%05d.jpg".format(
+        video_url, 
+        start_time,
+        end_time,
+        extract_fps, 
+        frame_dir_path)
     os.system(command)
 
     framecount = len(os.listdir(frame_dir_path))
