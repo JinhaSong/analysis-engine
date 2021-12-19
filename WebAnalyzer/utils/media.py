@@ -79,13 +79,22 @@ def get_audio_filename(filename, ext):
 
     return paths, urls, sub_dirs, file_lists
 
-def extract_audio(video_url):
+def extract_audio(video_url, start_time, end_time):
     video_name = get_filename(video_url)
     paths, urls, sub_dirs, file_lists = get_audio_filename(video_name, ".wav")
 
-    ffmpeg_commands = [
-        'ffmpeg -loglevel 8 -y -i {} -acodec pcm_s16le -ac 1 -ar 16000 {}'.format(video_url, paths[2])
-    ]
+    if end_time == "00:00:00.00":
+        ffmpeg_commands = [
+            'ffmpeg -loglevel 8 -y -i {} -acodec pcm_s16le -ac 1 -ar 16000 {}'.format(video_url, paths[2])
+        ]
+    else:
+        ffmpeg_commands = [
+            'ffmpeg -loglevel 8 -y -i {} -ss {} -to {} -acodec pcm_s16le -ac 1 -ar 16000 {}'.format(
+                video_url,
+                start_time,
+                end_time,
+                paths[2])
+        ]
 
     for ffmpeg in ffmpeg_commands :
         start_time = time.time()
