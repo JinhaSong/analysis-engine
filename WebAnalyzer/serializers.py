@@ -15,8 +15,10 @@ class VideoSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = VideoModel
-        fields = ('video', 'video_url', 'video_info', 'video_text', 'extract_fps', 'analysis_type', 'token', 'uploaded_date', 'updated_date', 'result')
+        fields = ('token', 'video', 'uploaded_date', 'updated_date', 'video_url', 'video_info', 'video_text', 'extract_fps',
+                  'start_time', 'end_time', 'analysis_type', 'result')
         read_only_fields = ('video_info', 'token', 'uploaded_date', 'updated_date', 'result')
+
 
 
 class AudioSerializer(serializers.HyperlinkedModelSerializer):
