@@ -101,7 +101,7 @@ def extract_frames(video_url, extract_fps, start_time, end_time):
         frame_url_list.append(os.path.join(url, str(frame_num) + ".jpg"))
         frame_path_list.append(path)
     print(Logging.i("Frames extraction is successfully ended."))
-    return frame_path_list, frame_url_list
+    return frame_path_list, frame_url_list, frame_dir_path
 
 
 def get_video_metadata(video_path):
