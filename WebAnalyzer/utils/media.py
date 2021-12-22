@@ -79,16 +79,16 @@ def extract_frames(video_url, extract_fps, start_time, end_time):
     frame_dir_path, url = get_video_dir_path(video_url)
     print(Logging.i("Frames extraction start."))
     if end_time == "00:00:00.00":
-        command = "ffmpeg -y -hide_banner -loglevel panic -i {} -vsync 2 -q:v 0 -vf fps={} {}/%05d.jpg".format(
-            video_url, 
-            extract_fps, 
+        command = "ffmpeg -y -hide_banner -loglevel panic -i {} -vsync 2 -q:v 0 -vf fps={} {}/frames/%05d.jpg".format(
+            video_url,
+            extract_fps,
             frame_dir_path)
     else:
-        command = "ffmpeg -y -hide_banner -loglevel panic -i {} -ss {} -to {} -vsync 2 -q:v 0 -vf fps={} {}/%05d.jpg".format(
-            video_url, 
+        command = "ffmpeg -y -hide_banner -loglevel panic -i {} -ss {} -to {} -vsync 2 -q:v 0 -vf fps={} {}/frames/%05d.jpg".format(
+            video_url,
             start_time,
             end_time,
-            extract_fps, 
+            extract_fps,
             frame_dir_path)
     os.system(command)
 
