@@ -1,8 +1,8 @@
 from __future__ import print_function
 
 import os, shutil, datetime
-from AnalysisModule.settings import MEDIA_ROOT
-from AnalysisModule.celerys import app
+from AnalysisEngine.settings import MEDIA_ROOT
+from AnalysisEngine.celerys import app
 from WebAnalyzer import models
 
 

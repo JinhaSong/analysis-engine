@@ -2,10 +2,10 @@ from django.db import models
 
 # Create your models here.
 from rest_framework import exceptions
-from AnalysisModule.config import DEBUG
+from AnalysisEngine.config import DEBUG
 from WebAnalyzer.tasks import analyzer_by_data
 from WebAnalyzer.utils import filename
-from django_mysql.models import JSONField
+from django.db.models import JSONField
 
 import ast
 
