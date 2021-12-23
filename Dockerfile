@@ -3,7 +3,7 @@ FROM nvidia/cuda:11.1-cudnn8-devel-ubuntu18.04
 RUN apt-get update \
     && apt-get -y install python3 python3-pip python3-dev \
     mysql-client libmysqlclient-dev python3-mysqldb \
-    git wget ssh vim \
+    git wget ssh vim locales \
     apt-utils libgl1 ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
@@ -19,6 +19,12 @@ RUN pip3 install setuptools
 WORKDIR /workspace
 ADD . .
 RUN pip3 install -r requirements.txt
+
+ENV LANGUAGE=ko_KR.UTF-8
+ENV LANG=ko_KR.UTF-8
+RUN locale-gen ko_KR ko_KR.UTF-8
+RUN update-locale LANG=ko_KR.UTF-8
+ENV PYTHONIOENCODING="UTF-8"
 
 ENV DJANGO_SUPERUSER_USERNAME root
 ENV DJANGO_SUPERUSER_EMAIL none@none.com
