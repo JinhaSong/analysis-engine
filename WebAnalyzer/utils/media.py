@@ -85,7 +85,7 @@ def extract_audio(video_url, start_time, end_time):
 
     if end_time == "00:00:00.00":
         ffmpeg_commands = [
-            'ffmpeg -loglevel 8 -y -i {} -acodec pcm_s16le -ac 1 -ar 16000 {}'.format(video_url, paths[1]),
+            'ffmpeg -loglevel 8 -y -i {} -acodec pcm_s16le -ac 1 -ar 16000 {}'.format(video_url, paths[0]),
         ]
     else:
         ffmpeg_commands = [
