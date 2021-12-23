@@ -6,4 +6,4 @@ from django.contrib import admin
 # Register your models here.
 from WebAnalyzer import models
 
-admin.site.register(models.MultiModalModel)
+admin.site.register(models.Final)

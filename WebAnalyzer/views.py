@@ -9,7 +9,7 @@ from rest_framework import viewsets, generics
 
 
 class MultiModalViewSet(viewsets.ModelViewSet):
-    queryset = MultiModalModel.objects.all()
+    queryset = Final.objects.all()
     serializer_class = MultiModalSerializer
 
     def get_queryset(self):

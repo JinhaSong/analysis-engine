@@ -10,7 +10,7 @@ from django.db.models import JSONField
 import ast
 
 
-class MultiModalModel(models.Model):
+class Final(models.Model):
     video = models.FileField(upload_to=filename.default, null=True)
     video_url = models.TextField(null=True)
     aggregation_result = models.TextField(null=False)
@@ -20,7 +20,7 @@ class MultiModalModel(models.Model):
     result = JSONField(null=True)
 
     def save(self, *args, **kwargs):
-        super(MultiModalModel, self).save(*args, **kwargs)
+        super(Final, self).save(*args, **kwargs)
 
         if DEBUG:
             task_get = ast.literal_eval(str(analyzer_by_data(self.aggregation_result)))
@@ -28,4 +28,4 @@ class MultiModalModel(models.Model):
             task_get = ast.literal_eval(str(analyzer_by_data.delay(self.aggregation_result).get()))
 
         self.result = task_get
-        super(MultiModalModel, self).save()
+        super(Final, self).save()
