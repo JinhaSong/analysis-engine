@@ -219,7 +219,8 @@ class Food(Dummy):
         }
 
         try:
-            object_infos = json.loads(str(object_info_text))["frame_results"]
+            object_infos = ast.literal_eval(object_info_text)
+            object_infos = object_infos["frame_results"]
         except:
             object_infos = None
 
