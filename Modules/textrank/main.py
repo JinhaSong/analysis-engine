@@ -111,8 +111,7 @@ class TextRank:
         start_time = time.time()
         test_flag = 1
         keyword_test_list = []
-
-        if data[0] != None :
+        if len(data) > 0 :
             keyword_test = {}
             for i in range(len(data)):
                 data[i] = self.clean_special_characters(self.clean_without_hangul(data[i]))
