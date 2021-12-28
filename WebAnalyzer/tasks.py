@@ -25,13 +25,13 @@ def module_load_init(**__):
     #   - Add your model
     #   - You can use worker_index if you need to get and set gpu_id
     #       - ex) gpu_id = worker_index % TOTAL_GPU_NUMBER
-    from Modules.dummy.main import Dummy
-    analyzer = Dummy()
+    from Modules.Final.main import Final
+    analyzer = Final()
 
 
 @app.task
-def analyzer_by_data(detection_result):
-    result = analyzer.inference_by_data(detection_result)
+def analyzer_by_data(module_results_url):
+    result = analyzer.inference_by_data(module_results_url)
     return result
 
 
