@@ -6,5 +6,5 @@ class MultiModalSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Final
-        fields = ('video', 'video_url', 'aggregation_result', 'token', 'uploaded_date', 'updated_date', 'result')
+        fields = ( 'token', 'video', 'video_url', 'module_results_url','uploaded_date', 'updated_date', 'result')
         read_only_fields = ('token', 'uploaded_date', 'updated_date', 'result')

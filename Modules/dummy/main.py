@@ -11,16 +11,17 @@ class Dummy:
     def __init__(self):
         # TODO
         #   - initialize and load model here
-        model_path = os.path.join(self.path, "model.txt")
-        self.model = open(model_path, "r")
+        # model_path = os.path.join(self.path, "model.txt")
+        # self.model = open(model_path, "r")
+        pass
 
-    def inference_by_data(self, aggregation_result):
-        aggregation_result = ast.literal_eval(aggregation_result)
+    def inference_by_data(self, module_results):
+        module_results = ast.literal_eval(module_results)
         result = []
         # TODO
-        #   - Inference using aggregation result
-        #   - how to use aggregation_result
-        #     for data in aggregation_result :
+        #   - Inference using module results
+        #   - how to use module_results
+        #     for data in module_results :
         #         aggregation_result[data] # Using this data
         result = {"aggregation_result": [
             {
