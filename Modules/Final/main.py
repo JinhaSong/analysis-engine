@@ -16,7 +16,7 @@ class Final(Dummy):
         "places_recognition",
         "food_detection",
         "object_detection",
-        "image_captioning",
+        # "image_captioning",
         "audio_event_detection",
         "audio_scene_classification",
         "automatic_speech_recognition",
