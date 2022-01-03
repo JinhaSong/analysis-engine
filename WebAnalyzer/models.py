@@ -72,7 +72,9 @@ class VideoModel(models.Model):
             self.video_info = get_video_metadata(video_path)
             video_info = {
                 "video_info": self.video_info,
-                "frame_urls": urls
+                "frame_urls": urls,
+                "start_time": self.start_time,
+                "end_time": self.end_time
             }
 
         if DEBUG:

@@ -11,7 +11,7 @@ import numpy as np
 
 from AnalysisEngine import settings
 from Modules.dummy.main import Dummy
-from WebAnalyzer.utils.media import frames_to_timecode
+from WebAnalyzer.utils.media import frames_to_timecode, timecode_to_frames
 from Modules.interaction.backbone import EfficientDetBackbone
 from Modules.interaction.efficientdet.utils import BBoxTransform, ClipBoxes
 from Modules.interaction.efficientdet.help_function import single_iou, single_ioa, single_inter, single_union, transform_action, label_to_class, sub_label_to_class
@@ -348,7 +348,6 @@ class HOI(Dummy):
         print(Logging.i("Model is successfully loaded - {} sec".format(end_time - start_time)))
 
     def inference_by_image(self, image_path, threshold=0.5):
-
         img_detection = self.img_detect(image_path, self.model, self.input_size, self.regressBoxes, self.clipBoxes, self.prior_mask, threshold=threshold)
         HO_dic = {}
         HO_set = set()
@@ -406,6 +405,7 @@ class HOI(Dummy):
     def inference_by_video(self, frame_path_list, infos):
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
+        start_timestamp = infos['start_time']
         fps = video_info['extract_fps']
         print(Logging.i("Start inference by video"))
         results = {
@@ -414,14 +414,15 @@ class HOI(Dummy):
             "frame_results": []
         }
 
+        base_frame_number = timecode_to_frames(start_timestamp, fps)
         start_time = time.time()
         for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
             if idx % 10 == 0:
                 print(Logging.i("Processing... (index: {}/{} / frame number: {} / path: {})".format(idx, len(frame_path_list), int((idx + 1) * fps), frame_path)))
             result = self.inference_by_image(frame_path)
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
-            result["frame_number"] = int((idx + 1) * fps)
-            result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
+            result["frame_number"] = base_frame_number + int((idx + 1) * fps)
+            result["timestamp"] = frames_to_timecode(result["frame_number"], fps)
             results["frame_results"].append(result)
 
         results["sequence_results"] = self.merge_sequence(results["frame_results"])
