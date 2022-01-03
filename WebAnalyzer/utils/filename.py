@@ -12,6 +12,17 @@ def default(instance, filename):
     return _path
 
 
+def _get_image_directory():
+    _date_now = datetime.datetime.now()
+    _directory = _date_now.strftime("%Y%m%d%H%M%S")
+    return _directory
+
+
+def image_path(instance, filename):
+    _path = os.path.join(_get_image_directory(), filename.split(".")[0], 'image', filename)
+    return _path
+
+
 def md5sum(instance, filename):
     _contents = instance.image.read()
     _base = hashlib.md5(bytes(_contents)).hexdigest()

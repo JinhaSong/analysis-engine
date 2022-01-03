@@ -16,7 +16,7 @@ import ast
 
 
 class ImageModel(models.Model):
-    image = models.ImageField(upload_to=filename.default)
+    image = models.ImageField(upload_to=filename.image_path)
     token = models.AutoField(primary_key=True)
     uploaded_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
@@ -26,9 +26,9 @@ class ImageModel(models.Model):
         super(ImageModel, self).save(*args, **kwargs)
 
         if DEBUG:
-            task_get = ast.literal_eval(str(analyzer_by_image(self.image.path, 'image')))
+            task_get = ast.literal_eval(str(analyzer_by_image(self.image.path)))
         else:
-            task_get = ast.literal_eval(str(analyzer_by_image.delay(self.image.path, 'image').get()))
+            task_get = ast.literal_eval(str(analyzer_by_image.delay(self.image.path).get()))
 
         self.result = task_get
         super(ImageModel, self).save()

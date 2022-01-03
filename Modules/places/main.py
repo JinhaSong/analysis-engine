@@ -57,6 +57,37 @@ class Places17(Dummy):
         end_time = time.time()
         print(Logging.i("Model is successfully loaded - {} sec".format(end_time - start_time)))
 
+    def inference_by_image(self, image_path):
+        image_path_dir = image_path.replace(image_path.split("/")[-1], "").replace("image", "")
+        datasets = ImageFolder(image_path_dir, transform=self.transforms, target_transform=None)
+        data_loader = DataLoader(datasets, batch_size=1, shuffle=False, num_workers=1)
+
+        allFiles, _ = map(list, zip(*data_loader.dataset.samples))
+
+        result = {}
+        for i, (input, label) in enumerate(data_loader):
+            self.model.eval()
+            input = input.to(self.device)
+
+            output = self.model(input)
+            loss = F.softmax(output, dim=1).data.squeeze()
+            probs, idx = loss.sort(0, True)
+            probs = probs.cpu().numpy()
+            idx = idx.cpu().numpy()
+            file_path = str(allFiles[i]).replace("/workspace", "")
+            result = {
+                "frame_url": file_path,
+                "frame_result": []
+            }
+            for j in range(0, self.topk):
+                label = {'label': {
+                    'description': self.classes[idx[j]],
+                    'score': float(probs[j]) * 100,
+                }}
+                result['frame_result'].append(label)
+
+        return result
+
     def inference_by_video(self, frame_path_list, infos):
         results = {
             "model_name": "places_recognition",
