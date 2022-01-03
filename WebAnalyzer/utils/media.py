@@ -128,3 +128,13 @@ def get_video_metadata(video_path):
 def frames_to_timecode(frames, fps):
     td = timedelta(seconds=(frames / fps))
     return str(td)
+
+def timecode_to_frames(timecode, fps):
+    split_timecode = timecode.split(":")
+    h = float(split_timecode[0])
+    m = float(split_timecode[1])
+    s_ms = float(split_timecode[2])
+    total_sec = h * 3600 + m * 60 + s_ms
+    frame_number = int(round(total_sec * fps))
+    
+    return frame_number
