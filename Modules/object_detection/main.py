@@ -144,7 +144,7 @@ class ObjectDetection(Dummy):
             result = self.inference_by_image(frame_path)
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
             result["frame_number"] = base_frame_number + int((idx + 1) * fps)
-            result["timestamp"] = frames_to_timecode(result["frame_number"] * fps, fps)
+            result["timestamp"] = frames_to_timecode(result["frame_number"], fps)
             results["frame_results"].append(result)
 
         results["sequence_results"] = self.merge_sequence(results["frame_results"])
