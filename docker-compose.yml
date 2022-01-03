@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   main:
-    container_name: hidf-engine-image-captioning_main
+    container_name: hidf-engine-captioning_main
     build:
       context: ./
       dockerfile: Dockerfile
@@ -30,7 +30,7 @@ services:
     tty: true
 
   mysql:
-    container_name: hidf-engine-image-captioning_mysql
+    container_name: hidf-engine-captioning_mysql
     image: mysql:latest
     restart: always
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
@@ -41,7 +41,7 @@ services:
     volumes:
       - ./mysql-data:/var/lib/mysql
   rabbitmq:
-    container_name: hidf-engine-image-captioning_rabbitmq
+    container_name: hidf-engine-captioning_rabbitmq
     image: rabbitmq:3.8.14
     restart: always
     env_file:
