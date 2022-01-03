@@ -127,7 +127,7 @@ class ObjectDetection(Dummy):
     def inference_by_video(self, frame_path_list, infos):
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
-        start_time = infos['start_time']
+        start_timestamp = infos['start_time']
         fps = video_info['extract_fps']
         print(Logging.i("Start inference by video"))
         results = {
@@ -136,7 +136,7 @@ class ObjectDetection(Dummy):
             "frame_results": []
         }
 
-        base_frame_number = timecode_to_frames(start_time, fps)
+        base_frame_number = timecode_to_frames(start_timestamp, fps)
         start_time = time.time()
         for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
             if idx % 10 == 0:
