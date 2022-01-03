@@ -1,6 +1,7 @@
 import ast
 import json
 
+from WebAnalyzer.utils.media import sum_timecodes
 from utils import Logging
 
 import socket
@@ -20,9 +21,17 @@ class AutomaticSpeechRecognition:
     def inference_by_audio(self, data, infos):
         paths = data['paths']
         sub_dirs = data['sub_dirs']
+        base_timestamp  = infos["start_time"]
 
         # ASR(Automatic Speech Recognition)
         asr_result = self.inference_asr(paths[2], sub_dirs[1] + "/")
+
+        for audio_result in asr_result["audio_results"]:
+            start_timestamp = audio_result["start_time"]
+            end_timestamp = audio_result["end_time"]
+            audio_result["start_time"] = sum_timecodes(base_timestamp, start_timestamp)
+            audio_result["end_time"] = sum_timecodes(base_timestamp, end_timestamp)
+
         asr_result["sequence_results"] = self.merge_sequence(asr_result["audio_results"])
         self.result = asr_result
 
