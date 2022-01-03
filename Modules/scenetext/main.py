@@ -18,8 +18,7 @@ from Modules.scenetext.utils import CTCLabelConverter, AttnLabelConverter
 from Modules.scenetext.dataset import RawDataset, AlignCollate
 from Modules.scenetext.model import Model
 
-from WebAnalyzer.utils.media import frames_to_timecode
-
+from WebAnalyzer.utils.media import frames_to_timecode, timecode_to_frames
 
 from Modules.scenetext.CRAFT_pytorch import Craft_inference
 from utils import Logging
@@ -206,6 +205,7 @@ class SceneText:
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
         fps = video_info['extract_fps']
+        start_time = infos['start_time']
         print(Logging.i("Start inference by video"))
         results = {
             "model_name": "scene_text_recognition",
@@ -213,14 +213,15 @@ class SceneText:
             "frame_results": []
         }
 
+        base_frame_number = timecode_to_frames(start_time, fps)
         start_time = time.time()
         for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
             if idx % 10 == 0:
                 print(Logging.i("Processing... (index: {}/{} / frame number: {} / path: {})".format(idx, len(frame_path_list), int((idx + 1) * fps), frame_path)))
             result = self.inference_by_image(frame_path)
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
-            result["frame_number"] = int((idx + 1) * fps)
-            result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
+            result["frame_number"] = base_frame_number + int((idx + 1) * fps)
+            result["timestamp"] = frames_to_timecode(result["frame_number"], fps)
             results["frame_results"].append(result)
 
         results["sequence_results"] = self.merge_sequence(results["frame_results"])
