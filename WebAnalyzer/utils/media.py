@@ -176,7 +176,6 @@ def timecode_to_frames(timecode, fps):
 
 
 def sum_timecodes(base_timecode, timecode):
-    base_timecode
     if "." in base_timecode:
         base_second = time.strptime(base_timecode, '%H:%M:%S.%f')
         base_ms = round(float(base_timecode.split(":")[-1]) % 1, 2)
