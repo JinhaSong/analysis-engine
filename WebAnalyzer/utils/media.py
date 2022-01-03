@@ -158,9 +158,11 @@ def get_video_metadata(video_path):
 
     return json_metadata
 
+
 def frames_to_timecode (frames, fps):
     td = timedelta(seconds=(frames / fps))
     return str(td)
+
 
 def timecode_to_frames(timecode, fps):
     split_timecode = timecode.split(":")
@@ -171,3 +173,26 @@ def timecode_to_frames(timecode, fps):
     frame_number = int(round(total_sec * fps))
     
     return frame_number
+
+
+def sum_timecodes(base_timecode, timecode):
+    base_timecode
+    if "." in base_timecode:
+        base_second = time.strptime(base_timecode, '%H:%M:%S.%f')
+        base_ms = round(float(base_timecode.split(":")[-1]) % 1, 2)
+    else:
+        base_second = time.strptime(base_timecode, '%H:%M:%S')
+        base_ms = 0.0
+    base_second = datetime.timedelta(hours=base_second.tm_hour, minutes=base_second.tm_min, seconds=base_second.tm_sec).total_seconds()
+    if "." in timecode:
+        second = time.strptime(timecode, '%H:%M:%S.%f')
+        ms = round(float(timecode.split(":")[-1]) % 1, 2)
+    else:
+        second = time.strptime(timecode, '%H:%M:%S')
+        ms = 0.0
+    second = datetime.timedelta(hours=second.tm_hour, minutes=second.tm_min, seconds=second.tm_sec).total_seconds()
+    total_second = base_second + second
+    total_ms = base_ms + ms
+    total_second += total_ms
+    total_timecode = str(datetime.timedelta(seconds=total_second))
+    return total_timecode

@@ -4,6 +4,7 @@ import tensorflow as tf
 from Modules.audio.src.aed import preprob as aed_preprob
 from Modules.audio.src.aed import process as aed_process
 from Modules.audio.src.aed import feats as aed_feats
+from WebAnalyzer.utils.media import sum_timecodes
 from utils import Logging
 import time
 
@@ -26,8 +27,14 @@ class AudioEventDetection:
     def inference_by_audio(self, data, infos):
         paths = data['paths']
         sub_dirs = data['sub_dirs']
+        start_timestamp  = infos["start_time"]
 
         aed_result = self.inference_aed(paths[0], sub_dirs[0] + "/")
+
+        for audio_result in aed_result["audio_results"]:
+            timestamp = audio_result["timestamp"]
+            audio_result["timestamp"] = sum_timecodes(start_timestamp, timestamp)
+
         aed_result["sequence_results"] = self.merge_sequence(aed_result["audio_results"])
         self.result = aed_result
 
