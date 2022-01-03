@@ -2,6 +2,8 @@ from collections import deque
 import numpy as np
 from math import pi, sqrt, exp
 
+from WebAnalyzer.utils.media import frames_to_timecode
+
 
 def labelMap(label_map_path):
     # {0:amusementpark, 1:aquarium ```}
@@ -80,7 +82,7 @@ class gaussianGrouping:
                 dq.popleft()
         return inference_list
 
-    def smoothing(self):
+    def smoothing(self, base_frame_number):
         inference_list = self.placesContext()
         result = []
         file_list = []
@@ -101,11 +103,20 @@ class gaussianGrouping:
         countLength = 0
         for i in range(len(result)):
             description = result[i][0]
-            start_frame = countLength * self.video_fps
+            start_frame = base_frame_number + countLength * self.video_fps
             length = len(result[i])
             countLength += length
-            end_frame = (countLength - 1) * self.video_fps
-            frame_result = {"start_frame": start_frame, "end_frame": end_frame, "label": {}}
+            end_frame = base_frame_number + (countLength - 1) * self.video_fps
+            start_timestamp = frames_to_timecode(start_frame, self.video_fps)
+            end_timestamp = frames_to_timecode(end_frame, self.video_fps)
+
+            frame_result = {
+                "start_frame": start_frame,
+                "end_frame": end_frame,
+                "start_timestamp": start_timestamp,
+                "end_timestamp": end_timestamp,
+                "label": {}
+            }
             label = {"description": description}
             frame_result["label"] = label
             sequence_result.append(frame_result)

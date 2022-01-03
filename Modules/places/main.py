@@ -20,7 +20,7 @@ import torch.nn.functional as F
 from AnalysisEngine import settings
 from Modules.places import wideresnet
 from Modules.dummy.main import Dummy
-from WebAnalyzer.utils.media import frames_to_timecode
+from WebAnalyzer.utils.media import frames_to_timecode, timecode_to_frames
 from utils import Logging
 from Modules.places.metrictracker import label_map
 from Modules.places.contextGrouping import gaussianGrouping
@@ -65,10 +65,12 @@ class Places17(Dummy):
         }
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
+        start_timestamp = infos['start_time']
         frame_dir_path = infos['frame_dir_path']
         fps = video_info['extract_fps']
         print(Logging.i("Start inference by video"))
 
+        base_frame_number = timecode_to_frames(start_timestamp, fps)
         start_time = time.time()
         datasets = ImageFolder(frame_dir_path, transform=self.transforms, target_transform=None)
         data_loader = DataLoader(datasets, batch_size=1, shuffle=False, num_workers=1)
@@ -88,8 +90,11 @@ class Places17(Dummy):
             probs = probs.cpu().numpy()
             idx = idx.cpu().numpy()
             file_path = str(allFiles[i]).replace("/workspace", "")
+            frame_number = base_frame_number + int((i + 1) * fps)
+            timestamp = frames_to_timecode(frame_number, fps)
             result = {
-                "frame_number": int((i + 1) * fps),
+                "frame_number": frame_number,
+                "timestamp": timestamp,
                 "frame_url": file_path,
                 "frame_result": []
             }
@@ -101,7 +106,7 @@ class Places17(Dummy):
                 result['frame_result'].append(label)
             results["frame_results"].append(result)
 
-        results["sequence_results"] = self.merge_sequence(results["frame_results"])
+        results["sequence_results"] = self.merge_sequence(results["frame_results"], base_frame_number)
 
         end_time = time.time()
         results['analysis_time'] = end_time - start_time
@@ -111,7 +116,7 @@ class Places17(Dummy):
 
         return self.result
 
-    def merge_sequence(self, result):
+    def merge_sequence(self, result, base_frame_number):
         f = gaussianGrouping(frame_results=result, label_map_path=self.classes_path)
-        sequence_results = f.smoothing()
+        sequence_results = f.smoothing(base_frame_number)
         return sequence_results
