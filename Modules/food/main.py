@@ -15,7 +15,7 @@ from AnalysisEngine import settings
 from Modules.food.darknet import Darknet, post_processing
 from Modules.food.efficientnet import EfficientNet
 from Modules.dummy.main import Dummy
-from WebAnalyzer.utils.media import frames_to_timecode
+from WebAnalyzer.utils.media import frames_to_timecode, timecode_to_frames
 from utils import Logging
 
 def load_class_names(namesfile):
@@ -210,6 +210,7 @@ class Food(Dummy):
         video_info = infos['video_info']
         object_info_text = infos['video_text']
         frame_urls = infos['frame_urls']
+        start_timestamp = infos['start_time']
         fps = video_info['extract_fps']
         print(Logging.i("Start inference by video"))
         results = {
@@ -224,6 +225,7 @@ class Food(Dummy):
         except:
             object_infos = None
 
+        base_frame_number = timecode_to_frames(start_timestamp, fps)
         start_time = time.time()
         if object_infos is None:
             for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
@@ -231,8 +233,8 @@ class Food(Dummy):
                     print(Logging.i("Processing(with detection)... (index: {}/{} / frame number: {} / path: {})".format(idx, len(frame_path_list), int((idx + 1) * fps), frame_path)))
                 result = self.inference_by_image(frame_path)
                 result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
-                result["frame_number"] = int((idx + 1) * fps)
-                result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
+                result["frame_number"] = base_frame_number + int((idx + 1) * fps)
+                result["timestamp"] = frames_to_timecode(result["frame_number"], fps)
                 results["frame_results"].append(result)
 
             results["sequence_results"] = self.merge_sequence(results["frame_results"])
@@ -242,8 +244,8 @@ class Food(Dummy):
                     print(Logging.i("Processing(no detection)... (index: {}/{} / frame number: {} / path: {})".format(idx, len(frame_path_list),int((idx + 1) * fps), frame_path)))
                 result = self.inference_by_image_no_detection(frame_path, object_infos[idx])
                 result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
-                result["frame_number"] = int((idx + 1) * fps)
-                result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
+                result["frame_number"] = base_frame_number + int((idx + 1) * fps)
+                result["timestamp"] = frames_to_timecode(result["frame_number"], fps)
                 results["frame_results"].append(result)
 
             results["sequence_results"] = self.merge_sequence(results["frame_results"])

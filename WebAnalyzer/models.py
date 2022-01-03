@@ -73,7 +73,9 @@ class VideoModel(models.Model):
             video_info = {
                 "video_info": self.video_info,
                 "frame_urls": urls,
-                "video_text": self.video_text
+                "video_text": self.video_text,
+                "start_time": self.start_time,
+                "end_time": self.end_time
             }
 
         if DEBUG:
