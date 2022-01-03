@@ -205,7 +205,7 @@ class SceneText:
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
         fps = video_info['extract_fps']
-        start_time = infos['start_time']
+        start_timestamp = infos['start_time']
         print(Logging.i("Start inference by video"))
         results = {
             "model_name": "scene_text_recognition",
@@ -213,7 +213,7 @@ class SceneText:
             "frame_results": []
         }
 
-        base_frame_number = timecode_to_frames(start_time, fps)
+        base_frame_number = timecode_to_frames(start_timestamp, fps)
         start_time = time.time()
         for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
             if idx % 10 == 0:
