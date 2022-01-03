@@ -106,10 +106,20 @@ def extract_audio(video_url, start_time, end_time):
     return paths, sub_dirs, file_lists
 
 
-def extract_frames(video_url, extract_fps):
+def extract_frames(video_url, extract_fps, start_time, end_time):
     frame_dir_path, url = get_video_dir_path(video_url)
-
-    command = "ffmpeg -y -hide_banner -loglevel panic -i {} -vsync 2 -q:v 0 -vf fps={} {}/%05d.jpg".format(video_url, extract_fps, frame_dir_path)
+    if end_time == "00:00:00.00":
+        command = "ffmpeg -y -hide_banner -loglevel panic -i {} -vsync 2 -q:v 0 -vf fps={} {}/%05d.jpg".format(
+            video_url, 
+            extract_fps, 
+            frame_dir_path)
+    else:
+        command = "ffmpeg -y -hide_banner -loglevel panic -i {} -ss {} -to {} -vsync 2 -q:v 0 -vf fps={} {}/%05d.jpg".format(
+            video_url, 
+            start_time,
+            end_time,
+            extract_fps, 
+            frame_dir_path)
     os.system(command)
 
     framecount = len(os.listdir(frame_dir_path))
@@ -147,3 +157,13 @@ def get_video_metadata(video_path):
 def frames_to_timecode (frames, fps):
     td = timedelta(seconds=(frames / fps))
     return str(td)
+
+def timecode_to_frames(timecode, fps):
+    split_timecode = timecode.split(":")
+    h = float(split_timecode[0])
+    m = float(split_timecode[1])
+    s_ms = float(split_timecode[2])
+    total_sec = h * 3600 + m * 60 + s_ms
+    frame_number = int(round(total_sec * fps))
+    
+    return frame_number
