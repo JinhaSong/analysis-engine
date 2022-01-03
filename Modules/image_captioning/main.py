@@ -12,7 +12,7 @@ from Modules.image_captioning.datasets import coco
 from Modules.image_captioning.configuration import Config
 from PIL import Image
 
-from WebAnalyzer.utils.media import frames_to_timecode
+from WebAnalyzer.utils.media import frames_to_timecode, timecode_to_frames
 from utils import Logging
 
 
@@ -88,6 +88,7 @@ class ImageCaptioning:
     def inference_by_video(self, frame_path_list, infos):
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
+        start_timestamp = infos['start_time']
         fps = video_info['extract_fps']
 
         print(Logging.i("Start inference by video"))
@@ -97,6 +98,7 @@ class ImageCaptioning:
             "frame_results": []
         }
 
+        base_frame_number = timecode_to_frames(start_timestamp, fps)
         start_time = time.time()
         for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
             if (idx % 50) == 0 and idx != 0:
@@ -105,8 +107,8 @@ class ImageCaptioning:
                 warnings.simplefilter("ignore")
                 result = self.inference_by_image(frame_path)
             result["frame_url"] = settings.MEDIA_URL + frame_url[1:]
-            result["frame_number"] = int((idx + 1) * fps)
-            result["timestamp"] = frames_to_timecode((idx + 1) * fps, fps)
+            result["frame_number"] = base_frame_number + int((idx + 1) * fps)
+            result["timestamp"] = frames_to_timecode(result["frame_number"], fps)
             results["frame_results"].append(result)
 
         results["sequence_results"] = self.merge_sequence(results["frame_results"])
