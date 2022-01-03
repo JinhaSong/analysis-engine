@@ -1,6 +1,7 @@
 from Modules.audio.src.asc import preprob as asc_preprob
 from Modules.audio.src.asc import process as asc_process
 from Modules.audio.src.asc import feats as asc_feats
+from WebAnalyzer.utils.media import sum_timecodes
 from utils import Logging
 
 import os
@@ -27,8 +28,15 @@ class AudioEventDetection:
     def inference_by_audio(self, data, infos):
         paths = data['paths']
         sub_dirs = data['sub_dirs']
+        start_timestamp  = infos["start_time"]
 
         asc_result = self.inference_asc(paths[1], sub_dirs[1] + "/")
+
+        for audio_result in asc_result["audio_results"]:
+            timestamp = audio_result["timestamp"]
+            audio_result["timestamp"] = sum_timecodes(start_timestamp, timestamp)
+            print(start_timestamp, timestamp, audio_result["timestamp"])
+
         asc_result["sequence_results"] = self.merge_sequence(asc_result["audio_results"])
         self.result = asc_result
 

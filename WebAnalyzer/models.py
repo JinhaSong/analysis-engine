@@ -60,7 +60,9 @@ class VideoModel(models.Model):
             self.video_info = get_video_metadata(video_path)
             data = {'paths': paths, 'sub_dirs': sub_dirs, 'file_lists': file_lists}
             video_info = {
-                "video_info": self.video_info
+                "video_info": self.video_info,
+                "start_time": self.start_time,
+                "end_time": self.end_time,
             }
 
         elif self.analysis_type == 'text':
