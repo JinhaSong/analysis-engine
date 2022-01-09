@@ -148,10 +148,10 @@ class SceneText:
                             right_bottom = bbox_coordinate[2]
                             right_bottom = list(map(int,right_bottom))
 
-                            x = left_top[0]
-                            w = x + left_top[1]
-                            y = right_bottom[0]
-                            h = y + right_bottom[1]
+                            x = int(round(bbox[0][0]))
+                            w = int(round(bbox[2][0])) - x
+                            y = int(round(bbox[0][1]))
+                            h = int(round(bbox[2][1])) - y
                             score = float(confidence)
 
                             result = {
@@ -171,6 +171,7 @@ class SceneText:
                             results.append(result)
                         except:
                             pass
+                        i += 1
 
         return results
 
@@ -205,7 +206,7 @@ class SceneText:
         video_info = infos['video_info']
         frame_urls = infos['frame_urls']
         fps = video_info['extract_fps']
-        start_timestamp = infos['start_time']
+        start_time = infos['start_time']
         print(Logging.i("Start inference by video"))
         results = {
             "model_name": "scene_text_recognition",
@@ -213,7 +214,7 @@ class SceneText:
             "frame_results": []
         }
 
-        base_frame_number = timecode_to_frames(start_timestamp, fps)
+        base_frame_number = timecode_to_frames(start_time, fps)
         start_time = time.time()
         for idx, (frame_path, frame_url) in enumerate(zip(frame_path_list, frame_urls)):
             if idx % 10 == 0:
