@@ -30,7 +30,7 @@ class SceneText:
     path = os.path.dirname(os.path.abspath(__file__))
     charset = open(os.path.join(path, 'kr_charset.txt'), 'r')
     charset_str = charset.readline()
-    charset_str = charset_str + '0123456789abcdefghijklmnopqrstuvwxyz'
+    character = charset_str + '0123456789abcdefghijklmnopqrstuvwxyz'
 
     def __init__(self):
         super().__init__()
