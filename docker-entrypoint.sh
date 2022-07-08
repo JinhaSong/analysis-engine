@@ -2,7 +2,7 @@
 set -e
 
 cd /workspace
-wget ftp://mldisk.sogang.ac.kr/hidf/scene_text_recognition/best_accuracy.pth -P /workspace/Modules/scenetext/weights
+wget ftp://mldisk.sogang.ac.kr/hidf/scene_text_recognition_nhy/best_accuracy.pth -P /workspace/Modules/scenetext/weights
 wget ftp://mldisk.sogang.ac.kr/hidf/scene_text_recognition/craft_mlt_25k.pth -P /workspace/Modules/scenetext/weights
 wget ftp://mldisk.sogang.ac.kr/hidf/scene_text_recognition/craft_refiner_CTW1500.pth -P /workspace/Modules/scenetext/weights
 
