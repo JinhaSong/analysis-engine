@@ -42,7 +42,7 @@ class SceneText:
             'batch_max_length': 25,
             'imgH': 32,
             'imgW': 100,
-            'rgb': False,
+            'rgb': True,
             'sensitive': False,
             'PAD': False,
             'Transformation': 'TPS',
