@@ -13,8 +13,8 @@ import WebAnalyzer.views
 router = DefaultRouter()
 
 router.register(r'image', WebAnalyzer.views.ImageViewSet)
-router.register(r'video', WebAnalyzer.views.VideoViewSet)
-router.register(r'audio', WebAnalyzer.views.AudioViewSet)
+# router.register(r'video', WebAnalyzer.views.VideoViewSet)
+# router.register(r'audio', WebAnalyzer.views.AudioViewSet)
 
 urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + [
     path('admin/', admin.site.urls),
