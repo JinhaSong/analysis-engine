@@ -12,3 +12,4 @@ mysql-connector-python
 opencv-python
 matplotlib==3.5.3
 scikit-learn==1.1.2
+efficientnet_pytorch==0.7.1

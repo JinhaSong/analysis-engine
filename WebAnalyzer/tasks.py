@@ -46,8 +46,8 @@ def analyzer_by_video(data, video_info, analysis_type):
 
 
 # For development version
-# if DEBUG:
-#     print(Logging.i("===================="))
-#     print(Logging.s("Development"))
-#     print(Logging.s("===================="))
-#     module_load_init()
+if DEBUG:
+    print(Logging.i("===================="))
+    print(Logging.s("Development"))
+    print(Logging.s("===================="))
+    module_load_init()

@@ -4,6 +4,9 @@ from AnalysisEngine import settings
 from Modules.dummy.example import test
 from WebAnalyzer.utils.media import frames_to_timecode
 from PIL import Image
+import torch
+from torchvision import transforms
+from efficientnet_pytorch import EfficientNet
 
 class BookCover:
     model = None
@@ -16,19 +19,21 @@ class BookCover:
         #   - initialize and load model here
         # model_path = os.path.join(self.path, "model.txt")
         # self.model = open(model_path, "r")
-        model = EfficientNet.from_pretrained(model_name, num_classes=dataset_info['nc'])
-        model.load_state_dict(torch.load(model_path))
+        self.model_name = "efficientnet-b0"
+        self.topk = 5
+        self.model = EfficientNet.from_pretrained(self.model_name, num_classes=len(self.class_names))
+        self.model.load_state_dict(torch.load(os.path.join(os.getcwd(), f"Modules/bookcover/weights/{self.model_name}.pt")))
 
-        transform = transforms.Compose([transforms.Resize(224), transforms.ToTensor(), transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), ])
+        self.transform = transforms.Compose([transforms.Resize(224), transforms.ToTensor(), transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), ])
 
     def inference_by_image(self, image_path):
         result = []
-        image = transform(Image.open(image_path)).unsqueeze(0)
-        model.eval()
+        image = self.transform(Image.open(image_path)).unsqueeze(0)
+        self.model.eval()
         with torch.no_grad():
-            outputs = model(image)
+            outputs = self.model(image)
 
-        for idx in torch.topk(outputs, k=topk).indices.squeeze(0).tolist():
+        for idx in torch.topk(outputs, k=self.topk).indices.squeeze(0).tolist():
             prob = torch.softmax(outputs, dim=1)[0, idx].item()
             result.append({'class': self.class_names[idx], 'prob': prob, "class_idx": idx})
         self.result = result
