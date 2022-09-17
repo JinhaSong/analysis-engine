@@ -10,3 +10,5 @@ mysqlclient==2.0.1
 mysql-connector
 mysql-connector-python
 opencv-python
+matplotlib==3.5.3
+scikit-learn==1.1.2
