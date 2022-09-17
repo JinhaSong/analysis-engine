@@ -2,6 +2,7 @@
 set -e
 
 cd /workspace
+wget ftp://mldisk.sogang.ac.kr/hidf/bookcover/efficientnet-b0.pt -O /workspace/Modules/bookcover/weights/efficientnet-b0.pt
 sh run_migration.sh
 python3 -c "import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'AnalysisEngine.settings'
