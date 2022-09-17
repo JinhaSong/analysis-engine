@@ -25,8 +25,8 @@ def module_load_init(**__):
     #   - Add your model
     #   - You can use worker_index if you need to get and set gpu_id
     #       - ex) gpu_id = worker_index % TOTAL_GPU_NUMBER
-    from Modules.dummy.main import Dummy
-    analyzer = Dummy()
+    from Modules.bookcover.main import BookCover
+    analyzer = BookCover()
 
 
 @app.task
@@ -46,8 +46,8 @@ def analyzer_by_video(data, video_info, analysis_type):
 
 
 # For development version
-if DEBUG:
-    print(Logging.i("===================="))
-    print(Logging.s("Development"))
-    print(Logging.s("===================="))
-    module_load_init()
+# if DEBUG:
+#     print(Logging.i("===================="))
+#     print(Logging.s("Development"))
+#     print(Logging.s("===================="))
+#     module_load_init()
